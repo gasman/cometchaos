@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+dumbledore:
+  id: 1
+  name: Dumbledore
+  game_id: 1 # public
+
+snape:
+  id: 2
+  name: Snape
+  game_id: 2 # private

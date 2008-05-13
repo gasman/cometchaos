@@ -1,0 +1,16 @@
+<h1>Editing game</h1>
+
+<%= error_messages_for :player, :game %>
+
+<% form_for(@game) do |f| %>
+	<%= render :partial => 'players/form', :object => @player %>
+
+	<%= render :partial => 'form', :object => @game %>
+
+	<p>
+		<%= f.submit "Update" %>
+	</p>
+<% end %>
+
+<%= link_to 'Show', @game %> |
+<%= link_to 'Back', games_path %>

@@ -1,0 +1,84 @@
+#splash {
+	width: 400px;
+	margin: auto;
+	border: 1px solid grey;
+	padding: 8px;
+}
+#splash h1 {
+	line-height: 1.2em;
+	text-align: center;
+}
+#splash h2 {
+	line-height: 1.2em;
+	text-align: center;
+}
+
+#games_list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+#games_list li {
+	border: 1px solid silver;
+	margin: 1px;
+	padding-left: 4px;
+	outline: 0;
+	list-style: none;
+	background-color: #ffffdd;
+}
+#games_list li .heading {
+	line-height: 16pt;
+	font-size: 12pt;
+}
+#games_list li .info {
+	font-size: 8pt;
+}
+
+#board {
+	background-color: black;
+	background-image: url(/images/board.png);
+	width: 512px;
+	height: 352px;
+	float: left;
+	position: relative;
+}
+	#board .sprite {
+		position: absolute;
+		width: 32px;
+		height: 32px;
+	}
+	#board #wizard_1 {
+		left: 96px;
+		top: 136px;
+	}
+	#board #wizard_2 {
+		left: 384px;
+		top: 136px;
+	}
+
+#players_panel {
+	float: right;
+	width: 300px;
+	border: 1px solid goldenrod;
+}
+#players_panel h2 {
+	text-align: center;
+}
+#players_panel #players_list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+#players_panel #players_list li {
+	height: 32px;
+	line-height: 32px;
+	border: 1px solid silver;
+	margin: 1px;
+	padding-left: 4px;
+	outline: 0;
+	list-style: none;
+}
+#players_panel #players_list li.me {
+	font-weight: bold;
+	background-color: salmon;
+}

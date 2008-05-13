@@ -1,0 +1,9 @@
+<% form_for(@game) do |f| %>
+	<%= render :partial => 'players/form', :object => @player %>
+
+	<%= render :partial => 'form', :object => @game %>
+
+	<p>
+		<%= f.submit "Create" %>
+	</p>
+<% end %>

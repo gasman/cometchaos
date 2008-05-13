@@ -1,0 +1,40 @@
+Retabulate
+==========
+
+The Retabulate plugin ensures that your Rails source files are indented with
+tabs rather than spaces. (Hopefully, the fact that you're interested in this
+plugin means that you think this is a good idea. If not - move along please,
+nothing to see here...)
+
+It does this via two methods: by providing a rake task to sweep the codebase
+of your application and convert any space-indented files it finds, and by
+intercepting the output of generators, converting any new files as they are
+created.
+
+By default, reindenting is performed on files with the extensions .rb,
+.html.erb, .css and .js. Note that YAML source files are required to use spaces
+for indenting, so these are left alone.
+
+
+Usage
+=====
+
+With the plugin installed, generators will produce tab-indented output with no
+further setup required. To perform a sweep of the codebase:
+
+  rake retab
+
+To change the set of file types which get converted, edit the
+CONVERTABLE_FILETYPES regexp at the top of
+vendor/plugins/retabulate/lib/retabulate.rb.
+
+
+Bugs
+====
+
+This will probably get in the way horribly if you use plugins with
+svn:externals.
+
+
+Copyright (c) 2008 Matt Westcott <matt@west.co.tt>,
+released under the MIT license

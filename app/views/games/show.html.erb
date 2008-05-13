@@ -1,0 +1,24 @@
+<%= javascript_tag "becomePlayer(#{me.id})" if playing? %>
+
+<div id="board">
+	<%= image_tag 'wizards/pointer.png', :size => '32x32', :class => 'sprite', :id => 'wizard_1' %>
+	<%= image_tag 'wizards/snooker.png', :size => '32x32', :class => 'sprite', :id => 'wizard_2' %>
+</div>
+
+<div id="players_panel">
+	<h2>Players</h2>
+	<ul id="players_list">
+		<%= render :partial => 'player', :collection => @game.players,
+			:locals => {:highlight_me => true} %>
+	</ul>
+
+	<% if not playing? %>
+		<h2>Join this game</h2>
+		<% form_for [@game, @new_player] do |f| %>
+			<%= render :partial => 'players/form', :object => @new_player %>
+			<%= f.submit 'Join' %>
+		<% end %>
+	<% end %>
+</div>
+
+<%= meteor_strike @game.channel %>

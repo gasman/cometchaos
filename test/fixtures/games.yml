@@ -1,0 +1,9 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+public:
+  owner_id: 1 # dumbledore
+  is_public: true
+
+private:
+  owner_id: 2 # snape
+  is_public: false

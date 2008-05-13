@@ -1,0 +1,19 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
+  <%= javascript_tag %Q{
+  (function(){
+    var channel = #{@channel.to_json};
+    var javascript = #{@javascript.to_json};
+    var execute = function(){
+      var ms = (parent.meteorStrike || parent.parent.meteorStrike)[channel];
+      if(ms) ms.evaluate(javascript, location.hash.slice(1));
+      else setTimeout(execute, 0);
+    };
+    execute();
+  })();
+  }%>
+</head>
+</html>

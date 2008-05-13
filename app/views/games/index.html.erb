@@ -1,0 +1,15 @@
+<div id="splash">
+	<h1>Chaos: The Battle Of Wizards</h2>
+	
+	<h2>Active games</h2>
+	<ul id="games_list">
+		<%= render :partial => 'announcement', :collection => @games %>
+	</ul>
+	
+	<br />
+	
+	<h2>New game</h2>
+	<%= render :partial => 'new_form' %>
+</div>
+
+<%= meteor_strike 'games' %>
