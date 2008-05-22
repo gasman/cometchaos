@@ -31,16 +31,13 @@ function removePlayer(id) {
 	jq('#player_'+id).remove();
 }
 
-function addGame(id, html) {
-	var game = jq(html).hide();
-	jq('#games_list').append(game);
-	game.slideDown();
-}
-function updateGame(id, html) {
+function announceGame(id, html) {
 	game = jq('#game_'+id);
 	if (game.length) {
 		game.replaceWith(html);
 	} else {
-		addGame(id, html);
+		var game = jq(html).hide();
+		jq('#games_list').append(game);
+		game.slideDown();
 	}
 }

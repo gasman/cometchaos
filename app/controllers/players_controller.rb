@@ -51,7 +51,7 @@ class PlayersController < ApplicationController
 			if @player.save
 				become_player(@player)
 				player_html = render_to_string :partial => 'games/player', :object => @player
-				Meteor.shoot @game.channel, "addPlayer(#{@player.id}, #{player_html.to_json})"
+				@game.broadcast "addPlayer(#{@player.id}, #{player_html.to_json})"
 				if @game.is_public?
 					game_html = render_to_string :partial => 'games/announcement', :object => @game
 					Meteor.shoot 'games', "updateGame(#{@game.id}, #{game_html.to_json})"

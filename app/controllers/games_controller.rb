@@ -56,11 +56,6 @@ class GamesController < ApplicationController
 
 			become_player(@player)
 
-			if @game.is_public?
-				game_html = render_to_string :partial => 'games/announcement', :object => @game
-				Meteor.shoot 'games', "addGame(#{@game.id}, #{game_html.to_json})"
-			end
-
 			respond_to do |format|
 				format.html { redirect_to(@game) }
 				format.xml  { render :xml => @game, :status => :created, :location => @game }
