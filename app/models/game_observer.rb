@@ -1,9 +1,29 @@
 class GameObserver < ActiveRecord::Observer
+	
+	def add_observer(obj)
+		@observers ||= []
+		@observers << obj
+	end
+
+	def delete_observer(obj)
+		@observers.delete obj if @observers
+	end
+
+	def after_create(game)
+		@observers.each do |ob|
+			ob.after_create_game(game) if ob.respond_to?(:after_create_game)
+		end
+	end
+
+	def after_update(game)
+		@observers.each do |ob|
+			ob.after_update_game(game) if ob.respond_to?(:after_update_game)
+		end
+	end
+
 	def after_save(game)
-		if game.is_public? and game.owner
-			renderer = InstantRenderer.new(:controller => 'games', :action => 'show')
-			game_html = renderer.render 'games/_announcement', :announcement => game
-			Meteor.shoot 'games', "addGame(#{game.id}, #{game_html.to_json})"
+		@observers.each do |ob|
+			ob.after_save_game(game) if ob.respond_to?(:after_save_game)
 		end
 	end
 end

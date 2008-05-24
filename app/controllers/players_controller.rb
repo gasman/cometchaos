@@ -1,4 +1,5 @@
 class PlayersController < ApplicationController
+	include GameEventObservation
 
 	# GET /games/1/players
 	# GET /games/1/players.xml
@@ -47,18 +48,18 @@ class PlayersController < ApplicationController
 		@player = Player.new(params[:player])
 		@player.game = @game
 
-		respond_to do |format|
-			if @player.save
-				become_player(@player)
-				player_html = render_to_string :partial => 'games/player', :object => @player
-				@game.broadcast "addPlayer(#{@player.id}, #{player_html.to_json})"
-				if @game.is_public?
-					game_html = render_to_string :partial => 'games/announcement', :object => @game
-					Meteor.shoot 'games', "updateGame(#{@game.id}, #{game_html.to_json})"
-				end
+		if @player.valid?
+			observing_game_events do
+				@player.save!
+			end
+			become_player(@player)
+
+			respond_to do |format|
 				format.html { redirect_to(@game) }
 				format.xml  { render :xml => @player, :status => :created, :location => @player }
-			else
+			end
+		else
+			respond_to do |format|
 				format.html { render :action => "new" }
 				format.xml  { render :xml => @player.errors, :status => :unprocessable_entity }
 			end

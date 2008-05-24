@@ -1,4 +1,6 @@
 class GamesController < ApplicationController
+	include GameEventObservation
+	
 	# GET /games
 	# GET /games.xml
 	def index
@@ -49,10 +51,12 @@ class GamesController < ApplicationController
 		@player.game = @game
 
 		if @game.valid? and @player.valid?
-			@game.save!
-			@game.owner = @player
-			@game.players << @player
-			@game.save!
+			observing_game_events do
+				@game.save!
+				@game.owner = @player
+				@game.players << @player
+				@game.save!
+			end
 
 			become_player(@player)
 
