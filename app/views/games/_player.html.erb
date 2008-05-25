@@ -1,4 +1,5 @@
 <% highlight_me ||= false %>
 <li id="player_<%= player.id %>" <% if highlight_me and playing? and player == me %>class="me"<% end %>>
 	<span class="name"><%=h player.name %></span>
+	<span class="self_actions"><%= link_to 'Leave', player, :method => :delete %></span>
 </li>

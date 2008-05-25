@@ -45,10 +45,13 @@ function announceGame(id, html) {
 function putSprite(id, img, x, y) {
 	var sprite = jq('#sprite_'+id);
 	if (!sprite.length) {
-		sprite = jq('<img class="sprite" width="32" height="32" alt="" />');
+		sprite = jq('<img class="sprite" width="32" height="32" alt="" />').attr('id', 'sprite_'+id);
 		jq('#board').append(sprite);
 	}
 	sprite.attr('src', img).css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
+}
+function removeSprite(id) {
+	jq('#sprite_'+id).remove();
 }
 
 function logEvent(html) {

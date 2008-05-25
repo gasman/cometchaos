@@ -26,4 +26,10 @@ class SpriteObserver < ActiveRecord::Observer
 			ob.after_save_sprite(sprite) if ob.respond_to?(:after_save_sprite)
 		end
 	end
+
+	def after_destroy(sprite)
+		(@observers || []).each do |ob|
+			ob.after_destroy_sprite(sprite) if ob.respond_to?(:after_destroy_sprite)
+		end
+	end
 end

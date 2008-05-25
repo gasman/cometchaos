@@ -52,6 +52,7 @@ class PlayersController < ApplicationController
 			observing_game_events do
 				@game.players << @player
 			end
+			announce_event(@game, "%s has joined the game", @player.name)
 
 			become_player(@player)
 
@@ -88,10 +89,19 @@ class PlayersController < ApplicationController
 	# DELETE /players/1.xml
 	def destroy
 		@player = Player.find(params[:id])
-		@player.destroy
+		@game = @player.game
+		raise "You can't kick a player because you're not playing!" unless playing?
+		observing_game_events do
+			@player.destroy
+		end
+		if @player == me
+			announce_event(@game, "%s has left the game", @player.name)
+		else
+			announce_event(@game, "%s was kicked by %s", @player.name, me.name)
+		end
 
 		respond_to do |format|
-			format.html { redirect_to(players_url) }
+			format.html { redirect_to @player.game }
 			format.xml  { head :ok }
 		end
 	end

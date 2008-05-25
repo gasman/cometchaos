@@ -2,7 +2,7 @@ class Player < ActiveRecord::Base
 	belongs_to :game
 	acts_as_list :scope => :game
 	
-	has_many :sprites
+	has_many :sprites, :dependent => :destroy
 	has_one :wizard_sprite, :class_name => 'Sprite', :conditions => "is_wizard = 't'"
 	
 	WIZARD_TYPES = %w(pointer snooker treetrunk molotov elvis nightie ghostie sticky)

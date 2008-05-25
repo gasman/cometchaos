@@ -26,4 +26,10 @@ class PlayerObserver < ActiveRecord::Observer
 			ob.after_save_player(player) if ob.respond_to?(:after_save_player)
 		end
 	end
+
+	def after_destroy(player)
+		(@observers || []).each do |ob|
+			ob.after_destroy_player(player) if ob.respond_to?(:after_destroy_player)
+		end
+	end
 end
