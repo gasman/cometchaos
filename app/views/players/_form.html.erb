@@ -1,6 +1,14 @@
 <% fields_for form do |f| %>
 	<p>
-		<b>Name</b><br />
+		<b>Player name</b><br />
 		<%= f.text_field :name %>
+	</p>
+	<p>
+		<b>Avatar</b><br />
+		<%= f.select :wizard_type, Player::WIZARD_TYPES.collect{|w| [w]}, :include_blank => f.object.wizard_type.blank? %>
+	</p>
+	<p>
+		<b>Colour</b><br />
+		<%= f.select :wizard_colour, Player::WIZARD_COLOURS.collect{|c| [c]}, :include_blank => f.object.wizard_colour.blank? %>
 	</p>
 <% end %>
