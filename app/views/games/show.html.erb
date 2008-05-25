@@ -1,9 +1,10 @@
 <%= javascript_tag "becomePlayer(#{me.id})" if playing? %>
 
 <div id="board">
-	<%= image_tag 'wizards/pointer.png', :size => '32x32', :class => 'sprite', :id => 'wizard_1' %>
-	<%= image_tag 'wizards/snooker.png', :size => '32x32', :class => 'sprite', :id => 'wizard_2' %>
 </div>
+<% for sprite in @game.sprites %>
+	<%= javascript_tag "putSprite(#{sprite.id}, #{image_path(sprite.image).to_json}, #{sprite.x}, #{sprite.y})" %>
+<% end %>
 
 <div id="players_panel">
 	<h2>Players</h2>

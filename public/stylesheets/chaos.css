@@ -47,14 +47,6 @@
 		width: 32px;
 		height: 32px;
 	}
-	#board #wizard_1 {
-		left: 96px;
-		top: 136px;
-	}
-	#board #wizard_2 {
-		left: 384px;
-		top: 136px;
-	}
 
 #players_panel {
 	float: right;

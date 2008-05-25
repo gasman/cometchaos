@@ -32,7 +32,7 @@ function removePlayer(id) {
 }
 
 function announceGame(id, html) {
-	game = jq('#game_'+id);
+	var game = jq('#game_'+id);
 	if (game.length) {
 		game.replaceWith(html);
 	} else {
@@ -40,4 +40,13 @@ function announceGame(id, html) {
 		jq('#games_list').append(game);
 		game.slideDown();
 	}
+}
+
+function putSprite(id, img, x, y) {
+	var sprite = jq('#sprite_'+id);
+	if (!sprite.length) {
+		sprite = jq('<img class="sprite" width="32" height="32" alt="" />');
+		jq('#board').append(sprite);
+	}
+	sprite.attr('src', img).css({'left': (32+x*32)+'px', 'top': (32+y*32)+'px'});
 }
