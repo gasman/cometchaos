@@ -15,6 +15,7 @@ module GameEventObservation
 		(@players_to_add || {}).values.each do |player|
 			player_html = render_to_string :partial => 'games/player', :object => player
 			player.game.broadcast "addPlayer(#{player.id}, #{player_html.to_json})"
+			announce_event(player.game, "%s has joined the game", player.name)
 		end
 		(@games_to_announce || {}).values.each do |game|
 			game_html = render_to_string :partial => 'games/announcement', :object => game
@@ -40,5 +41,11 @@ module GameEventObservation
 	def after_save_sprite(sprite) # TODO: only announce 'important' changes
 		@sprites_to_put ||= {}
 		@sprites_to_put[sprite.id] = sprite
+	end
+	
+	private
+	def announce_event(game, *event)
+		event_html = render_to_string(:partial => 'games/event', :object => event)
+		game.broadcast "logEvent(#{event_html.to_json})"
 	end
 end

@@ -52,6 +52,7 @@
 	float: right;
 	width: 300px;
 	border: 1px solid goldenrod;
+	margin-bottom: 8px;
 }
 #players_panel h2 {
 	text-align: center;
@@ -73,4 +74,12 @@
 #players_panel #players_list li.me {
 	font-weight: bold;
 	background-color: salmon;
+}
+
+#events_panel {
+	float: right;
+	width: 300px;
+	border: 1px solid goldenrod;
+	height: 300px;
+	overflow: scroll;
 }

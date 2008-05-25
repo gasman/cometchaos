@@ -1,0 +1,2 @@
+<%# invoke with an array to be used sprintf-style, e.g. ["%s was kicked by %s", "Vic", "Bob"] %>
+<%= h(event.first) % (event[1..-1].collect{|s| "<strong>#{h(s)}</strong>"}) %>

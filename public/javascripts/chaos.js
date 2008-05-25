@@ -50,3 +50,8 @@ function putSprite(id, img, x, y) {
 	}
 	sprite.attr('src', img).css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
 }
+
+function logEvent(html) {
+	var li = jq('<li></li>').append(html);
+	jq('#events_list').append(li);
+}
