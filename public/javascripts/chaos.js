@@ -48,5 +48,5 @@ function putSprite(id, img, x, y) {
 		sprite = jq('<img class="sprite" width="32" height="32" alt="" />');
 		jq('#board').append(sprite);
 	}
-	sprite.attr('src', img).css({'left': (32+x*32)+'px', 'top': (32+y*32)+'px'});
+	sprite.attr('src', img).css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
 }

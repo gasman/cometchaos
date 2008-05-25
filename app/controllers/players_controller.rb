@@ -47,11 +47,12 @@ class PlayersController < ApplicationController
 		@game = Game.find(params[:game_id])
 		@player = Player.new(params[:player])
 		@player.game = @game
-
+		
 		if @player.valid?
 			observing_game_events do
-				@player.save!
+				@game.players << @player
 			end
+
 			become_player(@player)
 
 			respond_to do |format|

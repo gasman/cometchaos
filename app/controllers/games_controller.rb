@@ -49,12 +49,10 @@ class GamesController < ApplicationController
 		@game = Game.new(params[:game])
 		@player = Player.new(params[:player])
 		@player.game = @game
+		@game.players << @player
 
-		if @game.valid? and @player.valid?
+		if @player.valid? and @game.valid?
 			observing_game_events do
-				@game.save!
-				@game.owner = @player
-				@game.players << @player
 				@game.save!
 			end
 

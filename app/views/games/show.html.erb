@@ -2,8 +2,11 @@
 
 <div id="board">
 </div>
-<% for sprite in @game.sprites %>
-	<%= javascript_tag "putSprite(#{sprite.id}, #{image_path(sprite.image).to_json}, #{sprite.x}, #{sprite.y})" %>
+<% javascript_tag do %>
+	<%= render :partial => 'games/sprite', :collection => @game.sprites %>
+	<%# TODO: Figure out how to persuade render:partial to render a file called
+		# _sprite.js.erb rather than _sprite.erb, because naming conventions dictate
+		# that that's what this ought to be called %>
 <% end %>
 
 <div id="players_panel">
