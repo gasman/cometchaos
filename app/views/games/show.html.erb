@@ -16,13 +16,13 @@
 			:locals => {:highlight_me => true} %>
 	</ul>
 
-	<% if not playing? %>
+	<div class="for_nonplayer">
 		<h2>Join this game</h2>
 		<% form_for [@game, @new_player] do |f| %>
 			<%= render :partial => 'players/form', :object => @new_player %>
 			<%= f.submit 'Join' %>
 		<% end %>
-	<% end %>
+	</div>
 </div>
 
 <div id="events_panel">

@@ -1,5 +1,12 @@
 <% highlight_me ||= false %>
-<li id="player_<%= player.id %>" <% if highlight_me and playing? and player == me %>class="me"<% end %>>
+<li id="player_<%= player.id %>" class="
+	<% if highlight_me and playing? and player == me %>me<% end %>
+	<% if player.is_operator? %>operator<% end %>">
 	<span class="name"><%=h player.name %></span>
 	<span class="self_actions"><%= link_to 'Leave', player, :method => :delete %></span>
+	<span class="operator_actions">
+		<%= link_to 'Kick', player, :method => :delete %>
+		<%= link_to 'Op', op_player_path(player), :method => :post %>
+		<%= link_to 'Deop', deop_player_path(player), :method => :post %>
+	</span>
 </li>

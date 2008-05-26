@@ -36,8 +36,8 @@ class ApplicationController < ActionController::Base
 		@me = @playing = nil # forget cached values of @me and @playing
 	end
 
-	def announce_event(game, *event)
+	def announce_event(*event)
 		event_html = render_to_string(:partial => 'games/event', :object => event)
-		game.broadcast "logEvent(#{event_html.to_json})"
+		@game.broadcast "logEvent(#{event_html.to_json})"
 	end
 end

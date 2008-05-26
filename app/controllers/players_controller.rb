@@ -52,7 +52,7 @@ class PlayersController < ApplicationController
 			observing_game_events do
 				@game.players << @player
 			end
-			announce_event(@game, "%s has joined the game", @player.name)
+			announce_event("%s has joined the game", @player.name)
 
 			become_player(@player)
 
@@ -76,7 +76,7 @@ class PlayersController < ApplicationController
 		respond_to do |format|
 			if @player.update_attributes(params[:player])
 				flash[:notice] = 'Player was successfully updated.'
-				format.html { redirect_to(@player) }
+				format.html { redirect_to(@game) }
 				format.xml  { head :ok }
 			else
 				format.html { render :action => "edit" }
@@ -90,20 +90,63 @@ class PlayersController < ApplicationController
 	def destroy
 		@player = Player.find(params[:id])
 		@game = @player.game
-		raise "You can't kick a player because you're not playing!" unless playing?
+		unless playing? and (@player == me or me.is_operator?)
+			raise "You can't kick a player because you're not an operator!"
+		end
 		observing_game_events do
 			@player.destroy
 		end
 		if @player == me
-			announce_event(@game, "%s has left the game", @player.name)
+			announce_event("%s has left the game", @player.name)
 		else
-			announce_event(@game, "%s was kicked by %s", @player.name, me.name)
+			announce_event("%s was kicked by %s", @player.name, me.name)
 		end
 
 		respond_to do |format|
-			format.html { redirect_to @player.game }
+			format.html { redirect_to @game }
 			format.xml  { head :ok }
 		end
 	end
+	
+	# POST /players/1/op
+	def op
+		@player = Player.find(params[:id])
+		@game = @player.game
+		unless playing? and me.is_operator?
+			raise "Only operators can op people"
+		end
+		observing_game_events do
+			@player.is_operator = true
+			@player.save!
+		end
+
+		announce_event("%s was promoted to operator by %s", @player.name, me.name)
+
+		respond_to do |format|
+			format.html { redirect_to @game }
+			format.xml  { head :ok }
+		end
+	end
+
+	# POST /players/1/deop
+	def deop
+		@player = Player.find(params[:id])
+		@game = @player.game
+		unless playing? and me.is_operator?
+			raise "Only operators can deop people"
+		end
+		observing_game_events do
+			@player.is_operator = false
+			@player.save!
+		end
+
+		announce_event("%s was demoted by %s", @player.name, me.name)
+
+		respond_to do |format|
+			format.html { redirect_to @game }
+			format.xml  { head :ok }
+		end
+	end
+	# TODO: do something to ensure that games can't end up with no operators
 
 end

@@ -1,5 +1,8 @@
 <% game = announcement %>
 <li id="game_<%= game.id %>">
 	<div class="heading"><%= link_to "Game #{game.id}", game %> - <%= pluralize(game.players.count, 'player', 'players') %></div>
-	<div class="info">started by <%=h game.owner.name %> <%= time_ago_in_words(game.created_at) %> ago</div>
+	<div class="info">
+		started <%= time_ago_in_words(game.created_at) %> ago.
+		<% if game.operators.size == 1 %>Operator<% else %>Operators<% end %>: <%= game.operators.collect{|op| h(op.name)}.join(', ') %>
+	</div>
 </li>

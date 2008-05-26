@@ -18,7 +18,7 @@ class GamesController < ApplicationController
 	# GET /games/1.xml
 	def show
 		@game = Game.find(params[:id])
-		@new_player = Player.new if not playing?
+		@new_player = Player.new
 
 		respond_to do |format|
 			format.html # show.html.erb
@@ -48,6 +48,7 @@ class GamesController < ApplicationController
 	def create
 		@game = Game.new(params[:game])
 		@player = Player.new(params[:player])
+		@player.is_operator = true
 		@player.game = @game
 		@game.players << @player
 

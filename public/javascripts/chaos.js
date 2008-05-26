@@ -13,22 +13,54 @@ function makeMyNameEditable() {
 
 /* jq(makeMyNameEditable); */
 
-var myPlayerId;
+var myPlayerId = null;
 function becomePlayer(id) {
 	myPlayerId = id;
 }
 
-function addPlayer(id, html) {
-	var player = jq(html).hide();
-	jq('#players_list').append(player);
+function showFurnitureForPlayer() {
+	jq('.for_nonplayer').hide();
+	jq('.for_player').show();
+}
+function showFurnitureForNonPlayer() {
+	jq('.for_player').hide();
+	jq('.for_nonplayer').show();
+}
+
+jq(function() {
+	var x = 1;
+	if (myPlayerId == null) {
+		showFurnitureForNonPlayer();
+	} else {
+		showFurnitureForPlayer();
+	}
+});
+
+function putPlayer(id, html) {
+	var newPlayer = jq(html);
 	if (id == myPlayerId) {
-		player.addClass('me');
+		newPlayer.addClass('me');
 		/* makeMyNameEditable(); */
 	}
-	player.slideDown();
+
+	var player = jq('#player_'+id);
+	if (player.length) {
+		player.replaceWith(newPlayer);
+	} else {
+		newPlayer.hide();
+		jq('#players_list').append(newPlayer);
+		newPlayer.slideDown();
+		if (id == myPlayerId) {
+			showFurnitureForPlayer();
+		}
+	}
 }
+
 function removePlayer(id) {
 	jq('#player_'+id).remove();
+	if (id == myPlayerId) {
+		showFurnitureForNonPlayer();
+	}
 }
 
 function announceGame(id, html) {
@@ -36,7 +68,7 @@ function announceGame(id, html) {
 	if (game.length) {
 		game.replaceWith(html);
 	} else {
-		var game = jq(html).hide();
+		game = jq(html).hide();
 		jq('#games_list').append(game);
 		game.slideDown();
 	}

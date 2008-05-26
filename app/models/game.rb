@@ -11,8 +11,7 @@ class Game < ActiveRecord::Base
 		[[0,9],[0,4],[0,0],[7,0],[14,0],[14,4],[14,9],[7,9]]
 	]
 	has_many :players, :order => 'position'
-	# owner is the earliest-created player of this game
-	has_one :owner, :class_name => 'Player', :order => 'created_at'
+	has_many :operators, :class_name => 'Player', :conditions => "is_operator = 't'"
 	has_many :sprites, :through => :players
 	
 	def channel
@@ -24,7 +23,7 @@ class Game < ActiveRecord::Base
 	end
 	
 	def self.all_active_public
-		find(:all, :conditions => "games.is_public = 't' AND players.id IS NOT NULL", :include => :owner)
+		find(:all, :conditions => "games.is_public = 't' AND players.id IS NOT NULL", :include => :operators)
 	end
 	
 	def set_wizard_start_positions

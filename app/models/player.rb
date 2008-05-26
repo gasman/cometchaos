@@ -5,6 +5,8 @@ class Player < ActiveRecord::Base
 	has_many :sprites, :dependent => :destroy
 	has_one :wizard_sprite, :class_name => 'Sprite', :conditions => "is_wizard = 't'"
 	
+	attr_protected :is_operator
+	
 	WIZARD_TYPES = %w(pointer snooker treetrunk molotov elvis nightie ghostie sticky)
 	WIZARD_COLOURS = %w(red magenta green cyan gold yellow grey white)
 	attr_accessor :wizard_type, :wizard_colour
@@ -16,8 +18,8 @@ class Player < ActiveRecord::Base
 	# the belongs_to association (such as game.players << player). But then it
 	# won't work *at all* if game is a new record.
 	# The Rails documentation can bite me.
-	validates_inclusion_of :wizard_type, :in => WIZARD_TYPES
-	validates_inclusion_of :wizard_colour, :in => WIZARD_COLOURS
+	validates_inclusion_of :wizard_type, :in => WIZARD_TYPES, :if => :new_record?
+	validates_inclusion_of :wizard_colour, :in => WIZARD_COLOURS, :if => :new_record?
 	
 	def after_create
 		self.wizard_sprite = Sprite.new(:image => "wizards/#{@wizard_type}_#{@wizard_colour}.png", :is_wizard => true)

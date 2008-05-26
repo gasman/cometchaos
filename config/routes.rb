@@ -1,5 +1,5 @@
 ActionController::Routing::Routes.draw do |map|
-	map.resources :players
+	map.resources :players, :member => { :op => :post, :deop => :post }
 	map.resources :games, :has_many => :players
 
 	map.root :controller => 'games'

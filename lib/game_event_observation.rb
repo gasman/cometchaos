@@ -12,9 +12,9 @@ module GameEventObservation
 		GameObserver.instance.delete_observer(self)
 		PlayerObserver.instance.delete_observer(self)
 		SpriteObserver.instance.delete_observer(self)
-		(@players_to_add || {}).values.each do |player|
+		(@players_to_put || {}).values.each do |player|
 			player_html = render_to_string :partial => 'games/player', :object => player
-			player.game.broadcast "addPlayer(#{player.id}, #{player_html.to_json})"
+			player.game.broadcast "putPlayer(#{player.id}, #{player_html.to_json})"
 		end
 		(@players_to_destroy || {}).values.each do |player|
 			player.game.broadcast "removePlayer(#{player.id})"
@@ -37,10 +37,14 @@ module GameEventObservation
 		@games_to_announce[game.id] = game if game.is_public?
 	end
 	def after_create_player(player)
-		@players_to_add ||= {}
-		@players_to_add[player.id] = player
+		@players_to_put ||= {}
+		@players_to_put[player.id] = player
 		@games_to_announce ||= {}
 		@games_to_announce[player.game.id] = player.game if player.game.is_public?
+	end
+	def after_save_player(player)
+		@players_to_put ||= {}
+		@players_to_put[player.id] = player
 	end
 	def after_destroy_player(player)
 		@players_to_destroy ||= {}
