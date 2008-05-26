@@ -13,6 +13,7 @@ function makeMyNameEditable() {
 
 /* jq(makeMyNameEditable); */
 
+var useTransitions = false;
 var myPlayerId = null;
 var myOperatorStatus = false;
 function becomePlayer(id, isOperator) {
@@ -23,12 +24,22 @@ function becomePlayer(id, isOperator) {
 }
 
 function showFurnitureForPlayer() {
-	jq('.for_nonplayer').hide();
-	jq('.for_player').show();
+	if (useTransitions) {
+		jq('.for_nonplayer').slideUp();
+		jq('.for_player').slideDown();
+	} else {
+		jq('.for_nonplayer').hide();
+		jq('.for_player').show();
+	}
 }
 function showFurnitureForNonPlayer() {
-	jq('.for_player').hide();
-	jq('.for_nonplayer').show();
+	if (useTransitions) {
+		jq('.for_player').slideUp();
+		jq('.for_nonplayer').slideDown();
+	} else {
+		jq('.for_player').hide();
+		jq('.for_nonplayer').show();
+	}
 }
 function indicateOperatorStatus() {
 	if (myOperatorStatus) {
@@ -78,6 +89,7 @@ jq(function() {
 		showFurnitureForPlayer();
 	}
 	indicateOperatorStatus();
+	useTransitions = true; /* OK to use transitions after initial page load */
 });
 
 function putPlayer(id, html) {
