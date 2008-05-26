@@ -16,36 +16,56 @@ function makeMyNameEditable() {
 var useTransitions = false;
 var myPlayerId = null;
 var myOperatorStatus = false;
+var gameState;
 function becomePlayer(id, isOperator) {
 	myPlayerId = id;
 	myOperatorStatus = isOperator;
-	showFurnitureForPlayer();
-	indicateOperatorStatus();
+	showFurnitureForPlayerState();
 }
 
-function showFurnitureForPlayer() {
-	if (useTransitions) {
-		jq('.for_nonplayer').slideUp();
-		jq('.for_player').slideDown();
+function showFurnitureForPlayerState() {
+	if (myPlayerId == null) {
+		/* non-player */
+		if (useTransitions) {
+			jq('.panel.for_player').slideUp();
+			jq('.panel.for_operator').slideUp();
+			jq('.panel.for_nonplayer').slideDown();
+			jq('.for_player:not(.panel)').hide();
+			jq('.for_operator:not(.panel)').hide();
+			jq('.for_nonplayer:not(.panel)').show();
+		} else {
+			jq('.for_player').hide();
+			jq('.for_operator').hide();
+			jq('.for_nonplayer').show();
+		}
+	} else if (myOperatorStatus == false) {
+		/* ordinary player */
+		if (useTransitions) {
+			jq('.panel.for_nonplayer').slideUp();
+			jq('.panel.for_player').slideDown();
+			jq('.panel.for_operator').slideUp();
+			jq('.for_nonplayer:not(.panel)').hide();
+			jq('.for_player:not(.panel)').show();
+			jq('.for_operator:not(.panel)').hide();
+		} else {
+			jq('.for_nonplayer').hide();
+			jq('.for_player').show();
+			jq('.for_operator').hide();
+		}
 	} else {
-		jq('.for_nonplayer').hide();
-		jq('.for_player').show();
-	}
-}
-function showFurnitureForNonPlayer() {
-	if (useTransitions) {
-		jq('.for_player').slideUp();
-		jq('.for_nonplayer').slideDown();
-	} else {
-		jq('.for_player').hide();
-		jq('.for_nonplayer').show();
-	}
-}
-function indicateOperatorStatus() {
-	if (myOperatorStatus) {
-		jq('body').addClass('i_am_operator');
-	} else {
-		jq('body').removeClass('i_am_operator');
+		/* operator */
+		if (useTransitions) {
+			jq('.panel.for_nonplayer').slideUp();
+			jq('.panel.for_player').slideDown();
+			jq('.panel.for_operator').slideDown();
+			jq('.for_nonplayer:not(.panel)').hide();
+			jq('.for_player:not(.panel)').show();
+			jq('.for_operator:not(.panel)').show();
+		} else {
+			jq('.for_nonplayer').hide();
+			jq('.for_player').show();
+			jq('.for_operator').show();
+		}
 	}
 }
 
@@ -81,17 +101,6 @@ function findHttpMethodClass(elem) {
 	return httpMethod;
 }
 
-jq(function() {
-	applyFormRemoting();
-	if (myPlayerId == null) {
-		showFurnitureForNonPlayer();
-	} else {
-		showFurnitureForPlayer();
-	}
-	indicateOperatorStatus();
-	useTransitions = true; /* OK to use transitions after initial page load */
-});
-
 function putPlayer(id, html) {
 	var newPlayer = applyFormRemoting(jq(html));
 	if (id == myPlayerId) {
@@ -107,15 +116,17 @@ function putPlayer(id, html) {
 		jq('#players_list').append(newPlayer);
 		newPlayer.slideDown();
 		if (id == myPlayerId) {
-			showFurnitureForPlayer();
+			showFurnitureForPlayerState();
 		}
 	}
 }
 
 function removePlayer(id) {
-	jq('#player_'+id).remove();
+	jq('#player_'+id).slideUp('normal', function() {jq(this).remove()});
 	if (id == myPlayerId) {
-		showFurnitureForNonPlayer();
+		myPlayerId = null;
+		myOperatorStatus = false;
+		showFurnitureForPlayerState();
 	}
 }
 
@@ -150,6 +161,27 @@ function logEvent(html) {
 function assignOperator(id, status) {
 	if (id == myPlayerId) {
 		myOperatorStatus = status;
-		indicateOperatorStatus();
+		showFurnitureForPlayerState();
 	}
 }
+
+function setGameState(state) {
+	gameState = state;
+	showGameState();
+}
+function showGameState() {
+	if (gameState == 'open') {
+		jq('#game_status').text('Open for joining');
+	} else if (gameState == 'choosing_spells') {
+		jq('#game_status').text('Choosing spells');
+	} else {
+		jq('#game_status').text('unknown... (' + gameState + ')');
+	}
+}
+
+jq(function() {
+	applyFormRemoting();
+	showGameState();
+	showFurnitureForPlayerState();
+	useTransitions = true; /* OK to use transitions after initial page load */
+});

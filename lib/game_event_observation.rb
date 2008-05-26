@@ -5,6 +5,7 @@ module GameEventObservation
 	# Execute a block with game event observers in place, then issue Comet messages
 	# to reflect what it saw
 	def observing_game_events
+		# TODO: set up observers to only watch events from a single game
 		GameObserver.instance.add_observer(self)
 		PlayerObserver.instance.add_observer(self)
 		SpriteObserver.instance.add_observer(self)
@@ -21,6 +22,7 @@ module GameEventObservation
 			player.game.broadcast "removePlayer(#{player.id})"
 		end
 		(@games_to_announce || {}).values.each do |game|
+			game.broadcast "setGameState(#{game.state.to_json})"
 			game_html = render_to_string :partial => 'games/announcement', :object => game
 			Meteor.shoot 'games', "announceGame(#{game.id}, #{game_html.to_json})"
 		end

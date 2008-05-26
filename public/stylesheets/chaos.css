@@ -66,8 +66,26 @@ body div {
 		height: 32px;
 	}
 
+#sidebar {
+	margin-left: 520px;
+	background-color: inherit;
+}
+
+#title_panel {
+	margin: 8px;
+	padding: 8px;
+	text-align: center;
+	font-family: Palatino, Georgia, serif;
+}
+#title_panel h1 {
+	font-family: Palatino, Georgia, serif;
+}
+#title_panel h2 {
+	font-size: 12px;
+}
+
 #players_panel {
-	margin: 8px 8px 8px 528px;
+	margin: 8px;
 	border: 1px solid goldenrod;
 }
 #players_panel h2 {
@@ -109,25 +127,17 @@ body div {
 #players_panel #players_list li.me .name {
 	font-weight: bold;
 }
-#players_panel #players_list li .self_actions {
-	float: right;
+#players_panel #players_list li .actions {
 	padding-right: 4px;
-	display: none;
-}
-#players_panel #players_list li.me .self_actions {
-	display: block;
+	float: right;
 }
 
-#players_panel #players_list li .operator_actions {
-	padding-right: 4px;
-	float: right;
-	display: none;
-}
-body.i_am_operator #players_panel #players_list li .operator_actions {
-	display: block;
-}
-body.i_am_operator #players_panel #players_list li.me .operator_actions {
-	display: none;
+/* only show self_actions for .me */
+#players_panel #players_list li .self_actions { display: none; }
+#players_panel #players_list li.me .self_actions { display: block; }
+
+#players_panel #players_list li.me .operator_actions {
+	display: none; /* don't show operator actions for self */
 }
 
 #players_panel #players_list li .operator_actions a.deop_link {

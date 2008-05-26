@@ -1,4 +1,6 @@
 class Game < ActiveRecord::Base
+	acts_as_state_machine :initial => :open
+	
 	WIZARD_START_POSITIONS = [
 		[],
 		[[1,4]],
@@ -14,6 +16,15 @@ class Game < ActiveRecord::Base
 	has_many :operators, :class_name => 'Player', :conditions => "is_operator = 't'"
 	has_many :sprites, :through => :players
 	
+	# state machine behaviour
+	state :open
+	state :choosing_spells
+	
+	event :start do
+		transitions :from => :open, :to => :choosing_spells
+	end
+	
+	# Comet communication
 	def channel
 		"game_#{self.id}"
 	end

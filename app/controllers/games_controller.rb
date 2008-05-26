@@ -100,4 +100,22 @@ class GamesController < ApplicationController
 		end
 	end
 	
+	# POST /games/1/start
+	def start
+		@game = Game.find(params[:id])
+		unless playing? and me.is_operator?
+			raise "Only operators can start the game"
+		end
+		observing_game_events do
+			@game.start!
+		end
+		announce_event("The game has started. Let battle commence!")
+
+		render :nothing => true and return if request.xhr?
+		respond_to do |format|
+			format.html { redirect_to(@game) }
+			format.xml  { head :ok }
+		end
+	end
+	
 end

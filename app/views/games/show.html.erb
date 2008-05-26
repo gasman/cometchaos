@@ -1,3 +1,4 @@
+<%= javascript_tag "setGameState(#{@game.state.to_json})" %>
 <%= javascript_tag "becomePlayer(#{me.id}, #{me.is_operator?})" if playing? %>
 
 <div id="state_of_play">
@@ -15,20 +16,31 @@
 	</div>
 </div>
 
-<div id="players_panel">
-	<h2>Players</h2>
-	<ul id="players_list">
-		<%= render :partial => 'player', :collection => @game.players,
-			:locals => {:highlight_me => true} %>
-	</ul>
-
-	<div class="for_nonplayer">
-		<h2>Join this game</h2>
-		<div class="join_game_form">
-			<% form_for [@game, @new_player], :html => {:class => 'remote post'} do |f| %>
-				<%= render :partial => 'players/form', :object => @new_player %>
-				<%= f.submit 'Join' %>
-			<% end %>
+<div id="sidebar">
+	<div id="title_panel">
+		<h1>Chaos</h1>
+		<h2>The Battle Of Wizards</h2>
+		<h3>Game <%= @game.id %> - <span id="game_status"></span></h3>
+	</div>
+	
+	<div id="players_panel">
+		<h2>Players</h2>
+		<ul id="players_list">
+			<%= render :partial => 'player', :collection => @game.players,
+				:locals => {:highlight_me => true} %>
+		</ul>
+	
+		<div class="panel for_nonplayer">
+			<h2>Join this game</h2>
+			<div class="join_game_form">
+				<% form_for [@game, @new_player], :html => {:class => 'remote post'} do |f| %>
+					<%= render :partial => 'players/form', :object => @new_player %>
+					<%= f.submit 'Join' %>
+				<% end %>
+			</div>
+		</div>
+		<div class="panel for_operator">
+			<%= link_to 'Start game', start_game_path, :class => 'remote post' %>
 		</div>
 	</div>
 </div>
