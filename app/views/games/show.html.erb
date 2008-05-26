@@ -1,4 +1,4 @@
-<%= javascript_tag "becomePlayer(#{me.id})" if playing? %>
+<%= javascript_tag "becomePlayer(#{me.id}, #{me.is_operator?})" if playing? %>
 
 <div id="board">
 </div>

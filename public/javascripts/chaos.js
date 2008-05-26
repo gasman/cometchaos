@@ -14,8 +14,10 @@ function makeMyNameEditable() {
 /* jq(makeMyNameEditable); */
 
 var myPlayerId = null;
-function becomePlayer(id) {
+var myOperatorStatus = false;
+function becomePlayer(id, isOperator) {
 	myPlayerId = id;
+	myOperatorStatus = isOperator;
 }
 
 function showFurnitureForPlayer() {
@@ -26,14 +28,21 @@ function showFurnitureForNonPlayer() {
 	jq('.for_player').hide();
 	jq('.for_nonplayer').show();
 }
+function indicateOperatorStatus() {
+	if (myOperatorStatus) {
+		jq('body').addClass('i_am_operator');
+	} else {
+		jq('body').removeClass('i_am_operator');
+	}
+}
 
 jq(function() {
-	var x = 1;
 	if (myPlayerId == null) {
 		showFurnitureForNonPlayer();
 	} else {
 		showFurnitureForPlayer();
 	}
+	indicateOperatorStatus();
 });
 
 function putPlayer(id, html) {
@@ -89,4 +98,11 @@ function removeSprite(id) {
 function logEvent(html) {
 	var li = jq('<li></li>').append(html);
 	jq('#events_list').append(li);
+}
+
+function assignOperator(id, status) {
+	if (id == myPlayerId) {
+		myOperatorStatus = status;
+		indicateOperatorStatus();
+	}
 }

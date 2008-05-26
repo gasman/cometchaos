@@ -120,6 +120,7 @@ class PlayersController < ApplicationController
 			@player.save!
 		end
 
+		@game.broadcast "assignOperator(#{@player.id}, true)"
 		announce_event("%s was promoted to operator by %s", @player.name, me.name)
 
 		respond_to do |format|
@@ -140,6 +141,7 @@ class PlayersController < ApplicationController
 			@player.save!
 		end
 
+		@game.broadcast "assignOperator(#{@player.id}, false)"
 		announce_event("%s was demoted by %s", @player.name, me.name)
 
 		respond_to do |format|

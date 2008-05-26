@@ -100,6 +100,13 @@
 #players_panel #players_list li .operator_actions {
 	padding-right: 4px;
 	float: right;
+	display: none;
+}
+body.i_am_operator #players_panel #players_list li .operator_actions {
+	display: block;
+}
+body.i_am_operator #players_panel #players_list li.me .operator_actions {
+	display: none;
 }
 
 #events_panel {
