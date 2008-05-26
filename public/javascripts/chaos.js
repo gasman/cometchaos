@@ -36,7 +36,26 @@ function indicateOperatorStatus() {
 	}
 }
 
+function applyFormRemoting(context) {
+	jq('a.remote', context).each(function() {
+		var elem = jq(this);
+		var httpMethod = 'post';
+		if (elem.hasClass('put')) {
+			httpMethod = 'put';
+		} else if (elem.hasClass('delete')) {
+			httpMethod = 'delete';
+		}
+
+		elem.click(function() {
+			jq.post(elem.attr('href'), {'_method': httpMethod}, function() {}, 'json');
+			return false;
+		});
+	})
+	return context;
+}
+
 jq(function() {
+	applyFormRemoting();
 	if (myPlayerId == null) {
 		showFurnitureForNonPlayer();
 	} else {
@@ -46,7 +65,7 @@ jq(function() {
 });
 
 function putPlayer(id, html) {
-	var newPlayer = jq(html);
+	var newPlayer = applyFormRemoting(jq(html));
 	if (id == myPlayerId) {
 		newPlayer.addClass('me');
 		/* makeMyNameEditable(); */

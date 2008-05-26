@@ -25,4 +25,8 @@ class Player < ActiveRecord::Base
 		self.wizard_sprite = Sprite.new(:image => "wizards/#{@wizard_type}_#{@wizard_colour}.png", :is_wizard => true)
 		game.set_wizard_start_positions
 	end
+	
+	def after_destroy
+		game.set_wizard_start_positions
+	end
 end

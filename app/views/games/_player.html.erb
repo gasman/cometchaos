@@ -3,10 +3,10 @@
 	<% if highlight_me and playing? and player == me %>me<% end %>
 	<% if player.is_operator? %>operator<% end %>">
 	<span class="name"><%=h player.name %></span>
-	<span class="self_actions"><%= link_to 'Leave', player, :method => :delete %></span>
+	<span class="self_actions"><%= link_to 'Leave', player, :class => "remote delete" %></span>
 	<span class="operator_actions">
-		<%= link_to 'Kick', player, :method => :delete %>
-		<%= link_to 'Op', op_player_path(player), :method => :post %>
-		<%= link_to 'Deop', deop_player_path(player), :method => :post %>
+		<%= link_to 'Kick', player, :class => "remote delete" %>
+		<%= link_to 'Op', op_player_path(player), :class => "remote post op_link" %>
+		<%= link_to 'Deop', deop_player_path(player), :class => "remote post deop_link" %>
 	</span>
 </li>

@@ -109,6 +109,16 @@ body.i_am_operator #players_panel #players_list li.me .operator_actions {
 	display: none;
 }
 
+#players_panel #players_list li .operator_actions a.deop_link {
+	display: none; /* don't show deop link for ordinary users */
+}
+#players_panel #players_list li.operator .operator_actions a.deop_link {
+	display: inline; /* show deop link for operators */
+}
+#players_panel #players_list li.operator .operator_actions a.op_link {
+	display: none; /* don't show op link for operators */
+}
+
 #events_panel {
 	float: right;
 	width: 300px;
