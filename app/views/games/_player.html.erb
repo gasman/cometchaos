@@ -2,6 +2,7 @@
 <li id="player_<%= player.id %>" class="
 	<% if highlight_me and playing? and player == me %>me<% end %>
 	<% if player.is_operator? %>operator<% end %>">
+	<%= image_tag player.wizard_sprite.image, :size => '32x32', :alt => '', :class => 'avatar' %>
 	<span class="name"><%=h player.name %></span>
 	<span class="self_actions"><%= link_to 'Leave', player, :class => "remote delete" %></span>
 	<span class="operator_actions">

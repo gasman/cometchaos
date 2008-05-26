@@ -1,16 +1,27 @@
+*{padding: 0; margin: 0;}
+
+body {
+	background-color: #222;
+}
+body div {
+	background-color: white;
+}
 #splash {
 	width: 400px;
 	margin: auto;
-	border: 1px solid grey;
+	margin-top: 20px;
+	border: 2px solid grey;
 	padding: 8px;
 }
 #splash h1 {
 	line-height: 1.2em;
+	margin-bottom: 0.4em;
 	text-align: center;
 }
 #splash h2 {
 	line-height: 1.2em;
 	text-align: center;
+	margin-bottom: 0.4em;
 }
 
 #games_list {
@@ -34,12 +45,19 @@
 	font-size: 8pt;
 }
 
+/* Game view */
+#state_of_play {
+	width: 528px;
+	margin-left: 8px;
+	float: left;
+	height: 0;
+	background-color: inherit;
+}
 #board {
 	background-color: black;
 	background-image: url(/images/board.png);
 	width: 512px;
 	height: 352px;
-	float: left;
 	position: relative;
 }
 	#board .sprite {
@@ -49,13 +67,12 @@
 	}
 
 #players_panel {
-	float: right;
-	width: 300px;
+	margin: 8px 8px 8px 528px;
 	border: 1px solid goldenrod;
-	margin-bottom: 8px;
 }
 #players_panel h2 {
 	text-align: center;
+	margin: 8px 0;
 }
 #players_panel #players_list {
 	list-style: none;
@@ -67,9 +84,13 @@
 	line-height: 32px;
 	border: 1px solid silver;
 	margin: 1px;
-	padding-left: 4px;
 	outline: 0;
 	list-style: none;
+}
+#players_panel #players_list li img.avatar {
+	background-color: black;
+	float: left;
+	margin-right: 4px;
 }
 #players_panel #players_list li .name {
 	float: left;
@@ -119,10 +140,18 @@ body.i_am_operator #players_panel #players_list li.me .operator_actions {
 	display: none; /* don't show op link for operators */
 }
 
+#players_panel .join_game_form {
+	margin: 12px;
+}
+
 #events_panel {
-	float: right;
-	width: 300px;
-	border: 1px solid goldenrod;
-	height: 300px;
-	overflow: scroll;
+	clear: both;
+	width: 512px;
+	margin-top: 8px;
+	background-color: #eeeedd;
+	height: 150px;
+	overflow: auto;
+}
+#events_panel #events_list {
+	margin: 4px;
 }

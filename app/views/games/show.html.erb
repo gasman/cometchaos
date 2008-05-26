@@ -1,13 +1,19 @@
 <%= javascript_tag "becomePlayer(#{me.id}, #{me.is_operator?})" if playing? %>
 
-<div id="board">
+<div id="state_of_play">
+	<div id="board">
+	</div>
+	<% javascript_tag do %>
+		<%= render :partial => 'games/sprite', :collection => @game.sprites %>
+		<%# TODO: Figure out how to persuade render:partial to render a file called
+			# _sprite.js.erb rather than _sprite.erb, because naming conventions dictate
+			# that that's what this ought to be called %>
+	<% end %>
+	<div id="events_panel">
+		<ul id="events_list">
+		</ul>
+	</div>
 </div>
-<% javascript_tag do %>
-	<%= render :partial => 'games/sprite', :collection => @game.sprites %>
-	<%# TODO: Figure out how to persuade render:partial to render a file called
-		# _sprite.js.erb rather than _sprite.erb, because naming conventions dictate
-		# that that's what this ought to be called %>
-<% end %>
 
 <div id="players_panel">
 	<h2>Players</h2>
@@ -18,16 +24,13 @@
 
 	<div class="for_nonplayer">
 		<h2>Join this game</h2>
-		<% form_for [@game, @new_player], :html => {:class => 'remote post'} do |f| %>
-			<%= render :partial => 'players/form', :object => @new_player %>
-			<%= f.submit 'Join' %>
-		<% end %>
+		<div class="join_game_form">
+			<% form_for [@game, @new_player], :html => {:class => 'remote post'} do |f| %>
+				<%= render :partial => 'players/form', :object => @new_player %>
+				<%= f.submit 'Join' %>
+			<% end %>
+		</div>
 	</div>
-</div>
-
-<div id="events_panel">
-	<ul id="events_list">
-	</ul>
 </div>
 
 <%= meteor_strike @game.channel %>
