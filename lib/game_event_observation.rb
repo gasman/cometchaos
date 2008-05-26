@@ -13,6 +13,7 @@ module GameEventObservation
 		PlayerObserver.instance.delete_observer(self)
 		SpriteObserver.instance.delete_observer(self)
 		(@players_to_put || {}).values.each do |player|
+			next if @players_to_destroy and @players_to_destroy.has_key?(player.id)
 			player_html = render_to_string :partial => 'games/player', :object => player
 			player.game.broadcast "putPlayer(#{player.id}, #{player_html.to_json})"
 		end
@@ -24,6 +25,7 @@ module GameEventObservation
 			Meteor.shoot 'games', "announceGame(#{game.id}, #{game_html.to_json})"
 		end
 		(@sprites_to_put || {}).values.each do |sprite|
+			next if @sprites_to_destroy and @sprites_to_destroy.has_key?(sprite.id)
 			sprite_js = render_to_string(:partial => 'games/sprite', :object => sprite)
 			sprite.game.broadcast sprite_js
 		end
