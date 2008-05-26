@@ -18,7 +18,7 @@
 
 	<div class="for_nonplayer">
 		<h2>Join this game</h2>
-		<% form_for [@game, @new_player] do |f| %>
+		<% form_for [@game, @new_player], :html => {:class => 'remote post'} do |f| %>
 			<%= render :partial => 'players/form', :object => @new_player %>
 			<%= f.submit 'Join' %>
 		<% end %>

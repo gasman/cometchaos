@@ -18,6 +18,8 @@ var myOperatorStatus = false;
 function becomePlayer(id, isOperator) {
 	myPlayerId = id;
 	myOperatorStatus = isOperator;
+	showFurnitureForPlayer();
+	indicateOperatorStatus();
 }
 
 function showFurnitureForPlayer() {
@@ -39,19 +41,33 @@ function indicateOperatorStatus() {
 function applyFormRemoting(context) {
 	jq('a.remote', context).each(function() {
 		var elem = jq(this);
-		var httpMethod = 'post';
-		if (elem.hasClass('put')) {
-			httpMethod = 'put';
-		} else if (elem.hasClass('delete')) {
-			httpMethod = 'delete';
-		}
-
+		var httpMethod = findHttpMethodClass(elem);
 		elem.click(function() {
-			jq.post(elem.attr('href'), {'_method': httpMethod}, function() {}, 'json');
+			jq.post(elem.attr('href'), {'_method': httpMethod}, function() {}, 'script');
 			return false;
 		});
 	})
+
+	jq('form.remote', context).each(function() {
+		var elem = jq(this);
+		var httpMethod = findHttpMethodClass(elem);
+		elem.submit(function() {
+			var params = elem.serialize() + '&_method=' + httpMethod;
+			jq.post(elem.attr('action'), params, function() {}, 'script');
+			return false;
+		});
+	})
+
 	return context;
+}
+function findHttpMethodClass(elem) {
+	var httpMethod = 'post';
+	if (elem.hasClass('put')) {
+		httpMethod = 'put';
+	} else if (elem.hasClass('delete')) {
+		httpMethod = 'delete';
+	}
+	return httpMethod;
 }
 
 jq(function() {

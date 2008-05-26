@@ -55,6 +55,11 @@ class PlayersController < ApplicationController
 			announce_event("%s has joined the game", @player.name)
 
 			become_player(@player)
+			
+			if request.xhr?
+				render :text => "becomePlayer(#{@player.id}, #{@player.is_operator?})"
+				return
+			end
 
 			respond_to do |format|
 				format.html { redirect_to(@game) }
@@ -102,6 +107,7 @@ class PlayersController < ApplicationController
 			announce_event("%s was kicked by %s", @player.name, me.name)
 		end
 
+		render :nothing => true and return if request.xhr?
 		respond_to do |format|
 			format.html { redirect_to @game }
 			format.xml  { head :ok }
@@ -123,6 +129,7 @@ class PlayersController < ApplicationController
 		@game.broadcast "assignOperator(#{@player.id}, true)"
 		announce_event("%s was promoted to operator by %s", @player.name, me.name)
 
+		render :nothing => true and return if request.xhr?
 		respond_to do |format|
 			format.html { redirect_to @game }
 			format.xml  { head :ok }
@@ -144,6 +151,7 @@ class PlayersController < ApplicationController
 		@game.broadcast "assignOperator(#{@player.id}, false)"
 		announce_event("%s was demoted by %s", @player.name, me.name)
 
+		render :nothing => true and return if request.xhr?
 		respond_to do |format|
 			format.html { redirect_to @game }
 			format.xml  { head :ok }
