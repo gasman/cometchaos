@@ -26,4 +26,10 @@ class GameObserver < ActiveRecord::Observer
 			ob.after_save_game(game) if ob.respond_to?(:after_save_game)
 		end
 	end
+	
+	def on_start(game)
+		@observers.each do |ob|
+			ob.on_start_game(game) if ob.respond_to?(:on_start_game)
+		end
+	end
 end

@@ -17,7 +17,7 @@ class Game < ActiveRecord::Base
 	has_many :sprites, :through => :players
 	
 	# state machine behaviour
-	state :open
+	state :open, :exit => :game_start_actions
 	state :choosing_spells
 	
 	event :start do
@@ -41,6 +41,29 @@ class Game < ActiveRecord::Base
 		starts = WIZARD_START_POSITIONS[self.players.size]
 		self.players.each_with_index do |player, i|
 			player.wizard_sprite.update_attributes(:x => starts[i][0], :y => starts[i][1])
+		end
+	end
+	
+	private
+	
+	def game_start_actions
+		distribute_spells
+		callback :on_start
+	end
+	
+	def distribute_spells
+		persistent_spell_types = SpellTypes::SpellType.find(:all,
+			:conditions => "is_persistent = 't'")
+		spell_types_in_rotation = SpellTypes::SpellType.find(:all,
+			:conditions => "is_in_rotation = 't'")
+
+		players.each do |player|
+			# provide one each of the persistent spell types
+			player.spells << persistent_spell_types.collect{|typ| Spell.new(:spell_type => typ)}
+			# and between 12 and 15 of the others
+			(12 + rand(4)).times do
+				player.spells << Spell.new(:spell_type => spell_types_in_rotation.rand)
+			end
 		end
 	end
 end

@@ -154,6 +154,30 @@ body div {
 	margin: 12px;
 }
 
+#spells_panel {
+	margin: 8px;
+}
+#spells_panel h2 {
+	text-align: center;
+	padding: 8px 0;
+}
+#spells_panel ul#spells_list {
+	width: 50%;
+	float: left;
+	margin: 0 8px 8px 8px;
+	font-size: 9pt;
+}
+#spells_panel ul#spells_list li {
+	text-align: center;
+	list-style-type: none;
+}
+#spells_panel ul#spells_list li a.current {
+	font-weight: bold;
+}
+#spells_panel ul#spells_list li .spell_info {
+	display: none;
+}
+
 #events_panel {
 	clear: both;
 	width: 512px;

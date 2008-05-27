@@ -1,5 +1,10 @@
-<%= javascript_tag "setGameState(#{@game.state.to_json})" %>
-<%= javascript_tag "becomePlayer(#{me.id}, #{me.is_operator?})" if playing? %>
+<% javascript_tag do %>
+	var gameId = <%= @game.id %>
+	setGameState(<%= @game.state.to_json %>)
+	<% if playing? %>
+		becomePlayer(<%= me.id %>, <%= me.is_operator? %>)
+	<% end %>
+<% end %>
 
 <div id="state_of_play">
 	<div id="board">
@@ -42,6 +47,18 @@
 		<div class="panel for_operator">
 			<%= link_to 'Start game', start_game_path, :class => 'remote post' %>
 		</div>
+	</div>
+	
+	<div id="spells_panel">
+		<h2>Spells</h2>
+		<ul id="spells_list">
+			<% if playing? %>
+				<%= render :partial => 'spells/list', :object => me.spells %>
+			<% end %>
+		</ul>
+		<div id="spell_info_view">
+		</div>
+		<br style="clear: both;" />
 	</div>
 </div>
 

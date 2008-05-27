@@ -179,8 +179,25 @@ function showGameState() {
 	}
 }
 
+function startGame() {
+	/* fetch spells */
+	jq('#spells_list').load('/games/' + gameId + '/spells', null, applySpellAnchors);
+}
+
+function applySpellAnchors() {
+	jq('#spells_list a.spell').click(function() {
+		var newSpellInfo = jq(jq(this).attr('href')).clone();
+		jq('#spell_info_view').replaceWith(newSpellInfo);
+		newSpellInfo.attr('id', 'spell_info_view');
+		jq('#spells_list a.spell').removeClass('current');
+		jq(this).addClass('current')
+		return false;
+	});
+}
+
 jq(function() {
 	applyFormRemoting();
+	applySpellAnchors();
 	showGameState();
 	showFurnitureForPlayerState();
 	useTransitions = true; /* OK to use transitions after initial page load */

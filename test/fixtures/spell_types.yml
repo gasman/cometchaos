@@ -1,0 +1,15 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  name: MyString
+  type: MyString
+  is_persistent: false
+  is_in_rotation: false
+  image: MyString
+
+two:
+  name: MyString
+  type: MyString
+  is_persistent: false
+  is_in_rotation: false
+  image: MyString

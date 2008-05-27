@@ -26,6 +26,9 @@ module GameEventObservation
 			game_html = render_to_string :partial => 'games/announcement', :object => game
 			Meteor.shoot 'games', "announceGame(#{game.id}, #{game_html.to_json})"
 		end
+		(@games_to_start || {}).values.each do |game|
+			game.broadcast "startGame()"
+		end
 		(@sprites_to_put || {}).values.each do |sprite|
 			next if @sprites_to_destroy and @sprites_to_destroy.has_key?(sprite.id)
 			sprite_js = render_to_string(:partial => 'games/sprite', :object => sprite)
@@ -37,6 +40,12 @@ module GameEventObservation
 	end
 	
 	def after_save_game(game) # TODO: only announce 'important' changes
+		@games_to_announce ||= {}
+		@games_to_announce[game.id] = game if game.is_public?
+	end
+	def on_start_game(game)
+		@games_to_start ||= {}
+		@games_to_start[game.id] = game
 		@games_to_announce ||= {}
 		@games_to_announce[game.id] = game if game.is_public?
 	end

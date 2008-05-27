@@ -1,5 +1,6 @@
 class Player < ActiveRecord::Base
 	belongs_to :game
+	has_many :spells, :include => :spell_type
 	acts_as_list :scope => :game
 	
 	has_many :sprites, :dependent => :destroy
