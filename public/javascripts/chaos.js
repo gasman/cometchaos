@@ -187,6 +187,7 @@ function startGame() {
 function applySpellAnchors() {
 	jq('#spells_list a.spell').click(function() {
 		var newSpellInfo = jq(jq(this).attr('href')).clone();
+		applyFormRemoting(newSpellInfo);
 		jq('#spell_info_view').replaceWith(newSpellInfo);
 		newSpellInfo.attr('id', 'spell_info_view');
 		jq('#spells_list a.spell').removeClass('current');

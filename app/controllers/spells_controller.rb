@@ -10,5 +10,12 @@ class SpellsController < ApplicationController
 	end
 
 	def select
+		@spell = Spell.find(params[:id], :include => {:player => :game})
+		@player = @spell.player
+		@game = @player.game
+		unless playing? and @player == me
+			raise "Attempted to select a spell that isn't yours"
+		end
+
 	end
 end

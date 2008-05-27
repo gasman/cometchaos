@@ -3,7 +3,7 @@
 		<%= link_to h(spell.name), "#spell_info_#{spell.id}", :class => 'spell' %>
 		<div class="spell_info" id="spell_info_<%= spell.id %>">
 			<h3><%=h spell.name %></h3>
-			<%= link_to "Select this spell" %>
+			<%= link_to "Select this spell", select_spell_path(spell), :class => 'remote post' %>
 		</div>
 	</li>
 <% end %>
