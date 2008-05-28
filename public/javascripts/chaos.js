@@ -29,6 +29,9 @@ function showConditionalFurniture() {
 		var show = true;
 		if (elem.hasClass('when_game_started') && gameState == 'open') show = false;
 		if (elem.hasClass('when_game_not_started') && gameState != 'open') show = false;
+		if (elem.hasClass('when_choosing_spells') && gameState != 'choosing_spells') show = false;
+		if (elem.hasClass('when_has_pending_spell') && !hasPendingSpell) show = false;
+		if (elem.hasClass('when_has_no_pending_spell') && hasPendingSpell) show = false;
 		if (elem.hasClass('for_nonplayer') && myPlayerId != null) show = false;
 		if (elem.hasClass('for_player') && myPlayerId == null) show = false;
 		if (elem.hasClass('for_operator') && myOperatorStatus == false) show = false;
@@ -147,6 +150,9 @@ function assignOperator(id, status) {
 function setGameState(state) {
 	gameState = state;
 	showGameState();
+	if (gameState == 'choosing_spells') {
+		jq('#players_list > li').addClass('awaiting_action');
+	}
 	showConditionalFurniture();
 }
 function showGameState() {
@@ -154,6 +160,8 @@ function showGameState() {
 		jq('#game_status').text('Open for joining');
 	} else if (gameState == 'choosing_spells') {
 		jq('#game_status').text('Choosing spells');
+	} else if (gameState == 'casting') {
+		jq('#game_status').text('Spellcasting');
 	} else {
 		jq('#game_status').text('unknown... (' + gameState + ')');
 	}
@@ -174,6 +182,13 @@ function applySpellAnchors() {
 		jq(this).addClass('current')
 		return false;
 	});
+}
+
+function markSpellAsChosen(id, html) {
+	jq('#spell_' + id).slideUp();
+	jq('#next_spell').html(html);
+	hasPendingSpell = true;
+	showConditionalFurniture();
 }
 
 jq(function() {

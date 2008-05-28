@@ -90,6 +90,7 @@ body div {
 }
 #players_panel h2 {
 	text-align: center;
+	font-family: Palatino, Georgia, serif;
 	margin: 8px 0;
 }
 #players_panel #players_list {
@@ -107,6 +108,11 @@ body div {
 }
 #players_panel #players_list li img.avatar {
 	background-color: black;
+	float: left;
+	margin-right: 4px;
+}
+#players_panel #players_list li.awaiting_action img.avatar {
+	background-color: grey;
 	float: left;
 	margin-right: 4px;
 }
@@ -159,6 +165,7 @@ body div {
 }
 #spells_panel h2 {
 	text-align: center;
+	font-family: Palatino, Georgia, serif;
 	padding: 8px 0;
 }
 #spells_panel ul#spells_list {
@@ -176,6 +183,16 @@ body div {
 }
 #spells_panel ul#spells_list li .spell_info {
 	display: none;
+}
+
+#spells_panel #next_spell {
+	clear: both;
+	text-align: center;
+	padding: 4px 0;
+	margin: 0 4px;
+	border: 1px solid grey;
+	background-color: #eeeeee;
+	font-family: Palatino, Georgia, serif;
 }
 
 #events_panel {

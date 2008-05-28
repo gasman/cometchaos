@@ -1,4 +1,7 @@
 class Game < ActiveRecord::Base
+
+	class InvalidMove < RuntimeError; end
+
 	acts_as_state_machine :initial => :open
 	
 	WIZARD_START_POSITIONS = [
@@ -18,10 +21,14 @@ class Game < ActiveRecord::Base
 	
 	# state machine behaviour
 	state :open, :exit => :game_start_actions
-	state :choosing_spells
+	state :choosing_spells, :enter => :start_choosing_spells
+	state :casting, :enter => :change_state_actions
 	
 	event :start do
 		transitions :from => :open, :to => :choosing_spells
+	end
+	event :continue do
+		transitions :from => :choosing_spells, :to => :casting, :guard => lambda {|game| game.players.all?(&:has_chosen_spell?) }
 	end
 	
 	# Comet communication
@@ -38,6 +45,7 @@ class Game < ActiveRecord::Base
 	end
 	
 	def set_wizard_start_positions
+		return unless self.open?
 		starts = WIZARD_START_POSITIONS[self.players.size]
 		self.players.each_with_index do |player, i|
 			player.wizard_sprite.update_attributes(:x => starts[i][0], :y => starts[i][1])
@@ -65,5 +73,16 @@ class Game < ActiveRecord::Base
 				player.spells << Spell.new(:spell_type => spell_types_in_rotation.rand)
 			end
 		end
+	end
+	
+	def start_choosing_spells
+		self.players.each do |player|
+			player.update_attributes(:has_chosen_spell => false, :next_spell_id => nil)
+		end
+		change_state_actions
+	end
+	
+	def change_state_actions
+		callback :on_state_change
 	end
 end

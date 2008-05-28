@@ -1,4 +1,5 @@
 class SpellsController < ApplicationController
+	include GameEventObservation
 
 	# GET /games/1/spells
 	def index
@@ -17,6 +18,21 @@ class SpellsController < ApplicationController
 		unless playing? and @player == me
 			raise "Attempted to select a spell that isn't yours"
 		end
+		observing_game_events do
+			@player.choose_spell!(@spell)
+			@game.continue!
+		end
+		
+		if request.xhr?
+			chosen_spell_html = render_to_string(
+				:partial => 'spells/chosen_spell', :object => @spell)
+			render :text => "markSpellAsChosen(#{@spell.id}, #{chosen_spell_html.to_json})"
+			return
+		end
 
+		respond_to do |format|
+			format.html { redirect_to @game }
+			format.xml  { head :ok }
+		end
 	end
 end

@@ -32,4 +32,10 @@ class PlayerObserver < ActiveRecord::Observer
 			ob.after_destroy_player(player) if ob.respond_to?(:after_destroy_player)
 		end
 	end
+
+	def after_choose_spell(player)
+		(@observers || []).each do |ob|
+			ob.after_player_chooses_spell(player) if ob.respond_to?(:after_player_chooses_spell)
+		end
+	end
 end

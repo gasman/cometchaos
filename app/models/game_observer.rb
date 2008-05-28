@@ -32,4 +32,10 @@ class GameObserver < ActiveRecord::Observer
 			ob.on_start_game(game) if ob.respond_to?(:on_start_game)
 		end
 	end
+	
+	def on_state_change(game)
+		@observers.each do |ob|
+			ob.on_game_state_change(game) if ob.respond_to?(:on_game_state_change)
+		end
+	end
 end

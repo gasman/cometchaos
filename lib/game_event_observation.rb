@@ -22,12 +22,14 @@ module GameEventObservation
 			player.game.broadcast "removePlayer(#{player.id})"
 		end
 		(@games_to_announce || {}).values.each do |game|
-			game.broadcast "setGameState(#{game.state.to_json})"
 			game_html = render_to_string :partial => 'games/announcement', :object => game
 			Meteor.shoot 'games', "announceGame(#{game.id}, #{game_html.to_json})"
 		end
 		(@games_to_start || {}).values.each do |game|
 			game.broadcast "startGame()"
+		end
+		(@games_to_continue || {}).values.each do |game|
+			game.broadcast "setGameState(#{game.state.to_json})"
 		end
 		(@sprites_to_put || {}).values.each do |sprite|
 			next if @sprites_to_destroy and @sprites_to_destroy.has_key?(sprite.id)
@@ -39,23 +41,29 @@ module GameEventObservation
 		end
 	end
 	
-	def after_save_game(game) # TODO: only announce 'important' changes
-		@games_to_announce ||= {}
-		@games_to_announce[game.id] = game if game.is_public?
-	end
 	def on_start_game(game)
 		@games_to_start ||= {}
 		@games_to_start[game.id] = game
 		@games_to_announce ||= {}
 		@games_to_announce[game.id] = game if game.is_public?
 	end
+
+	def on_game_state_change(game)
+		@games_to_continue ||= {}
+		@games_to_continue[game.id] = game
+	end
+
 	def after_create_player(player)
 		@players_to_put ||= {}
 		@players_to_put[player.id] = player
 		@games_to_announce ||= {}
 		@games_to_announce[player.game.id] = player.game if player.game.is_public?
 	end
-	def after_save_player(player)
+	def after_save_player(player) # TODO: only announce 'important' changes
+		@players_to_put ||= {}
+		@players_to_put[player.id] = player
+	end
+	def after_player_chooses_spell(player)
 		@players_to_put ||= {}
 		@players_to_put[player.id] = player
 	end
