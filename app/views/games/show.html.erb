@@ -35,7 +35,7 @@
 				:locals => {:highlight_me => true} %>
 		</ul>
 	
-		<div class="panel for_nonplayer">
+		<div class="conditional panel for_nonplayer when_game_not_started">
 			<h2>Join this game</h2>
 			<div class="join_game_form">
 				<% form_for [@game, @new_player], :html => {:class => 'remote post'} do |f| %>
@@ -44,12 +44,12 @@
 				<% end %>
 			</div>
 		</div>
-		<div class="panel for_operator">
+		<div class="conditional panel for_operator when_game_not_started">
 			<%= link_to 'Start game', start_game_path, :class => 'remote post' %>
 		</div>
 	</div>
 	
-	<div id="spells_panel">
+	<div id="spells_panel" class="conditional panel for_player when_game_started">
 		<h2>Spells</h2>
 		<ul id="spells_list">
 			<% if playing? %>

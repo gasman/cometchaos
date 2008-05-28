@@ -1,8 +1,10 @@
 ActionController::Routing::Routes.draw do |map|
 	map.resources :players, :member => { :op => :post, :deop => :post }
 	map.resources :games, :has_many => [:players], :member => { :start => :post } do |games|
-		map.resources :spells, :member => { :select => :post }
+		games.resources :spells
 	end
+	
+	map.resources :spells, :member => { :select => :post }
 
 	map.root :controller => 'games'
 

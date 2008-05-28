@@ -20,53 +20,32 @@ var gameState;
 function becomePlayer(id, isOperator) {
 	myPlayerId = id;
 	myOperatorStatus = isOperator;
-	showFurnitureForPlayerState();
+	showConditionalFurniture();
 }
 
-function showFurnitureForPlayerState() {
-	if (myPlayerId == null) {
-		/* non-player */
-		if (useTransitions) {
-			jq('.panel.for_player').slideUp();
-			jq('.panel.for_operator').slideUp();
-			jq('.panel.for_nonplayer').slideDown();
-			jq('.for_player:not(.panel)').hide();
-			jq('.for_operator:not(.panel)').hide();
-			jq('.for_nonplayer:not(.panel)').show();
+function showConditionalFurniture() {
+	jq('.conditional').each(function() {
+		var elem = jq(this);
+		var show = true;
+		if (elem.hasClass('when_game_started') && gameState == 'open') show = false;
+		if (elem.hasClass('when_game_not_started') && gameState != 'open') show = false;
+		if (elem.hasClass('for_nonplayer') && myPlayerId != null) show = false;
+		if (elem.hasClass('for_player') && myPlayerId == null) show = false;
+		if (elem.hasClass('for_operator') && myOperatorStatus == false) show = false;
+		if (show) {
+			if (useTransitions && elem.hasClass('panel')) {
+				elem.slideDown();
+			} else {
+				elem.show();
+			}
 		} else {
-			jq('.for_player').hide();
-			jq('.for_operator').hide();
-			jq('.for_nonplayer').show();
+			if (useTransitions && elem.hasClass('panel')) {
+				elem.slideUp();
+			} else {
+				elem.hide();
+			}
 		}
-	} else if (myOperatorStatus == false) {
-		/* ordinary player */
-		if (useTransitions) {
-			jq('.panel.for_nonplayer').slideUp();
-			jq('.panel.for_player').slideDown();
-			jq('.panel.for_operator').slideUp();
-			jq('.for_nonplayer:not(.panel)').hide();
-			jq('.for_player:not(.panel)').show();
-			jq('.for_operator:not(.panel)').hide();
-		} else {
-			jq('.for_nonplayer').hide();
-			jq('.for_player').show();
-			jq('.for_operator').hide();
-		}
-	} else {
-		/* operator */
-		if (useTransitions) {
-			jq('.panel.for_nonplayer').slideUp();
-			jq('.panel.for_player').slideDown();
-			jq('.panel.for_operator').slideDown();
-			jq('.for_nonplayer:not(.panel)').hide();
-			jq('.for_player:not(.panel)').show();
-			jq('.for_operator:not(.panel)').show();
-		} else {
-			jq('.for_nonplayer').hide();
-			jq('.for_player').show();
-			jq('.for_operator').show();
-		}
-	}
+	})
 }
 
 function applyFormRemoting(context) {
@@ -116,7 +95,7 @@ function putPlayer(id, html) {
 		jq('#players_list').append(newPlayer);
 		newPlayer.slideDown();
 		if (id == myPlayerId) {
-			showFurnitureForPlayerState();
+			showConditionalFurniture();
 		}
 	}
 }
@@ -126,7 +105,7 @@ function removePlayer(id) {
 	if (id == myPlayerId) {
 		myPlayerId = null;
 		myOperatorStatus = false;
-		showFurnitureForPlayerState();
+		showConditionalFurniture();
 	}
 }
 
@@ -161,13 +140,14 @@ function logEvent(html) {
 function assignOperator(id, status) {
 	if (id == myPlayerId) {
 		myOperatorStatus = status;
-		showFurnitureForPlayerState();
+		showConditionalFurniture();
 	}
 }
 
 function setGameState(state) {
 	gameState = state;
 	showGameState();
+	showConditionalFurniture();
 }
 function showGameState() {
 	if (gameState == 'open') {
@@ -200,6 +180,6 @@ jq(function() {
 	applyFormRemoting();
 	applySpellAnchors();
 	showGameState();
-	showFurnitureForPlayerState();
+	showConditionalFurniture();
 	useTransitions = true; /* OK to use transitions after initial page load */
 });

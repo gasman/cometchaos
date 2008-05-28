@@ -9,6 +9,7 @@ class SpellsController < ApplicationController
 		render :partial => 'spells/list', :object => @spells if request.xhr?
 	end
 
+	# POST /spells/1/select
 	def select
 		@spell = Spell.find(params[:id], :include => {:player => :game})
 		@player = @spell.player
