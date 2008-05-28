@@ -112,9 +112,12 @@ body div {
 	margin-right: 4px;
 }
 #players_panel #players_list li.awaiting_action img.avatar {
-	background-color: grey;
+	background-image: url(/images/backgrounds/black_grey_throbber.gif);
 	float: left;
 	margin-right: 4px;
+}
+#players_panel #players_list li.me.awaiting_action {
+	background-image: url(/images/backgrounds/red_white_throbber.gif);
 }
 #players_panel #players_list li .name {
 	float: left;
