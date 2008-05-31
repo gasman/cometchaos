@@ -65,6 +65,27 @@ body div {
 		width: 32px;
 		height: 32px;
 	}
+	#board .sprite.highlight {
+		background-color: #333333;
+	}	
+	#board .casting_position {
+		position: absolute;
+		width: 32px;
+		height: 32px;
+		background-color: #333333;
+	}
+	#board .casting_position:hover {
+		background-color: #666666;
+	}
+	#board .move_position {
+		position: absolute;
+		width: 32px;
+		height: 32px;
+		background-color: #333333;
+	}
+	#board .move_position:hover {
+		background-color: #666666;
+	}
 
 #sidebar {
 	margin-left: 520px;
@@ -110,6 +131,9 @@ body div {
 	background-color: black;
 	float: left;
 	margin-right: 4px;
+}
+#players_panel #players_list li img.avatar.hover {
+	background-color: #333333;
 }
 #players_panel #players_list li.awaiting_action img.avatar {
 	background-image: url(/images/backgrounds/black_grey_throbber.gif);

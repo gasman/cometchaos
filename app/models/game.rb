@@ -15,20 +15,29 @@ class Game < ActiveRecord::Base
 		[[4,9],[0,6],[1,1],[7,0],[13,1],[14,6],[10,9]],
 		[[0,9],[0,4],[0,0],[7,0],[14,0],[14,4],[14,9],[7,9]]
 	]
+	BOARD_WIDTH = 15
+	BOARD_HEIGHT = 10
+	
 	has_many :players, :order => 'position'
+	has_many :players_with_spells_to_cast, :class_name => 'Player', :conditions => "next_spell_id IS NOT NULL", :order => 'position'
 	has_many :operators, :class_name => 'Player', :conditions => "is_operator = 't'"
 	has_many :sprites, :through => :players
+	belongs_to :current_player, :class_name => 'Player', :foreign_key => 'current_player_id'
+	# TODO: protect some of these from mass-assignment
 	
 	# state machine behaviour
 	state :open, :exit => :game_start_actions
 	state :choosing_spells, :enter => :start_choosing_spells
-	state :casting, :enter => :change_state_actions
+	state :casting, :enter => :start_casting
+	state :combat, :enter => :start_combat
 	
 	event :start do
 		transitions :from => :open, :to => :choosing_spells
 	end
 	event :continue do
 		transitions :from => :choosing_spells, :to => :casting, :guard => lambda {|game| game.players.all?(&:has_chosen_spell?) }
+		transitions :from => :casting, :to => :combat, :guard => lambda {|game| game.players_with_spells_to_cast(true).empty? }
+		transitions :from => :combat, :to => :choosing_spells, :guard => lambda {|game| game.current_player == game.players.last }
 	end
 	
 	# Comet communication
@@ -49,6 +58,34 @@ class Game < ActiveRecord::Base
 		starts = WIZARD_START_POSITIONS[self.players.size]
 		self.players.each_with_index do |player, i|
 			player.wizard_sprite.update_attributes(:x => starts[i][0], :y => starts[i][1])
+		end
+	end
+	
+	def next_player!
+		if self.casting?
+			next_player = players_with_spells_to_cast.find(:first,
+				:conditions => ['position > ?', current_player.position])
+			if next_player
+				self.current_player = next_player
+				save!
+				self.current_player.begin_turn
+			else
+				# all players have cast spells
+				self.continue!
+			end
+		elsif self.combat?
+			next_player = players.find(:first,
+				:conditions => ['position > ?', current_player.position])
+			if next_player
+				self.current_player = next_player
+				save!
+				self.current_player.begin_turn
+			else
+				# all players have completed combat
+				self.continue!
+			end
+		else
+			raise InvalidMove.new, "Game is not currently in a turn-based phase"
 		end
 	end
 	
@@ -77,8 +114,32 @@ class Game < ActiveRecord::Base
 	
 	def start_choosing_spells
 		self.players.each do |player|
-			player.update_attributes(:has_chosen_spell => false, :next_spell_id => nil)
+			player.update_attribute(:has_chosen_spell, false)
+			player.update_attribute(:next_spell_id, nil)
 		end
+		change_state_actions
+	end
+	
+	def start_casting
+		if players_with_spells_to_cast.any?
+			self.current_player = players_with_spells_to_cast.first
+			self.current_player.begin_turn
+			save!
+		else
+			continue!
+		end
+		change_state_actions
+	end
+
+	def start_combat
+		# need to reload sprites association, because a sprite may have been added
+		# outside of the game model in this current request
+		sprites(true).each do |sprite|
+			sprite.update_attribute(:remaining_moves, sprite.movement_allowance)
+		end
+		self.current_player = players.first
+		self.current_player.begin_turn
+		save!
 		change_state_actions
 	end
 	

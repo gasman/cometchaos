@@ -1,5 +1,5 @@
 <% highlight_me ||= false %>
-<li id="player_<%= player.id %>" class="
+<li id="player_<%= player.id %>" class="player
 	<% if highlight_me and playing? and player == me %>me<% end %>
 	<% if player.awaiting_action? %>awaiting_action<% end %>
 	<% if player.is_operator? %>operator<% end %>">

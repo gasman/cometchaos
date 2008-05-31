@@ -10,31 +10,31 @@ class GameObserver < ActiveRecord::Observer
 	end
 
 	def after_create(game)
-		@observers.each do |ob|
+		(@observers || []).each do |ob|
 			ob.after_create_game(game) if ob.respond_to?(:after_create_game)
 		end
 	end
 
 	def after_update(game)
-		@observers.each do |ob|
+		(@observers || []).each do |ob|
 			ob.after_update_game(game) if ob.respond_to?(:after_update_game)
 		end
 	end
 
 	def after_save(game)
-		@observers.each do |ob|
+		(@observers || []).each do |ob|
 			ob.after_save_game(game) if ob.respond_to?(:after_save_game)
 		end
 	end
 	
 	def on_start(game)
-		@observers.each do |ob|
+		(@observers || []).each do |ob|
 			ob.on_start_game(game) if ob.respond_to?(:on_start_game)
 		end
 	end
 	
 	def on_state_change(game)
-		@observers.each do |ob|
+		(@observers || []).each do |ob|
 			ob.on_game_state_change(game) if ob.respond_to?(:on_game_state_change)
 		end
 	end

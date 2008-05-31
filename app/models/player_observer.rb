@@ -38,4 +38,16 @@ class PlayerObserver < ActiveRecord::Observer
 			ob.after_player_chooses_spell(player) if ob.respond_to?(:after_player_chooses_spell)
 		end
 	end
+
+	def on_begin_turn(player)
+		(@observers || []).each do |ob|
+			ob.on_player_begin_turn(player) if ob.respond_to?(:on_player_begin_turn)
+		end
+	end
+
+	def on_end_turn(player)
+		(@observers || []).each do |ob|
+			ob.on_player_end_turn(player) if ob.respond_to?(:on_player_end_turn)
+		end
+	end
 end

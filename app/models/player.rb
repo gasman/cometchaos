@@ -25,7 +25,8 @@ class Player < ActiveRecord::Base
 	validates_inclusion_of :wizard_colour, :in => WIZARD_COLOURS, :if => :new_record?
 	
 	def after_create
-		self.wizard_sprite = Sprite.new(:image => "wizards/#{@wizard_type}_#{@wizard_colour}.png", :is_wizard => true)
+		self.wizard_sprite = Sprite.new(:image => "wizards/#{@wizard_type}_#{@wizard_colour}.png",
+			:is_wizard => true, :movement_allowance => 1)
 		game.set_wizard_start_positions
 	end
 	
@@ -37,9 +38,10 @@ class Player < ActiveRecord::Base
 	end
 	
 	def awaiting_action?
-		game.choosing_spells? and !has_chosen_spell?
+		(game.choosing_spells? and !has_chosen_spell?) or
+		(game.casting? and game.current_player == self) or
+		(game.combat? and game.current_player == self)
 	end
-	
 	
 	def choose_spell!(spell)
 		raise Game::InvalidMove.new, "You have already chosen a spell" if has_chosen_spell?
@@ -49,5 +51,47 @@ class Player < ActiveRecord::Base
 		self.has_chosen_spell = true
 		save!
 		callback :after_choose_spell
+	end
+	
+	# not intended to be called directly; game will call this when it's this player's turn,
+	# to trigger callbacks
+	def begin_turn
+		callback :on_begin_turn
+	end
+	
+	def end_turn
+		game.next_player!
+		callback :on_end_turn
+	end
+	
+	def is_casting?
+		game and game.casting? and game.current_player == self
+	end
+	def is_fighting?
+		game and game.combat? and game.current_player == self
+	end
+	
+	# coordinates where this player can cast his next spell
+	def casting_positions
+		raise Game::InvalidMove.new, "You cannot cast a spell at this time" unless is_casting?
+		
+		occupied_squares = game.sprites.collect{|sprite| [sprite.x, sprite.y]}
+		available_squares = []
+		
+		wizard_sprite.each_adjacent_square do |x,y|
+			available_squares << [x,y] unless occupied_squares.include?([x,y])
+		end
+		available_squares
+	end
+	
+	def cast!(x, y)
+		x = x.to_i
+		y = y.to_i
+		raise Game::InvalidMove.new, "You cannot cast a spell at this time" unless is_casting?
+		raise Game::InvalidMove.new, "Out of range" unless casting_positions.include?([x,y])
+		next_spell.cast!(x,y)
+		self.next_spell = nil
+		save!
+		end_turn
 	end
 end

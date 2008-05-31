@@ -1,10 +1,19 @@
 <% javascript_tag do %>
-	var gameId = <%= @game.id %>
-	setGameState(<%= @game.state.to_json %>)
+	var gameId = <%= @game.id %>;
+	setGameState(<%= @game.state.to_json %>);
 	<% if playing? %>
-		becomePlayer(<%= me.id %>, <%= me.is_operator? %>)
+		becomePlayer(<%= me.id %>, <%= me.is_operator? %>);
+		<% if me.is_casting? %>
+			jq(function() {
+				showCastingPositions(<%= me.casting_positions.to_json %>);
+			});
+		<% end %>
 	<% end %>
-	var hasPendingSpell = <%= !!(playing? and me.next_spell) %>
+	var hasPendingSpell = <%= !!(playing? and me.next_spell) %>;
+	var hasChosenSpell = <%= !!(playing? and me.has_chosen_spell?) %>;
+	<% if @game.combat? and @game.current_player %>
+		currentPlayerId = <%= @game.current_player.id %>;
+	<% end %>
 <% end %>
 
 <div id="state_of_play">
@@ -47,6 +56,9 @@
 		</div>
 		<div class="conditional panel for_operator when_game_not_started">
 			<%= link_to 'Start game', start_game_path, :class => 'remote post' %>
+		</div>
+		<div class="conditional panel for_player when_my_turn">
+			<%= link_to 'End turn', end_turn_game_path, :class => 'remote post' %>
 		</div>
 	</div>
 	

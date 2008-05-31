@@ -3,7 +3,12 @@
 		<%= link_to h(spell.name), "#spell_info_#{spell.id}", :class => 'spell' %>
 		<div class="spell_info" id="spell_info_<%= spell.id %>">
 			<h3><%=h spell.name %></h3>
-			<%= link_to "Select this spell", select_spell_path(spell), :class => 'remote post conditional when_choosing_spells when_has_no_pending_spell' %>
+			<ul>
+				<% if spell.spell_type.is_a?(SpellTypes::CreatureSpell) %>
+					<li>Movement allowance: <%= spell.spell_type.movement_allowance %></li>
+				<% end %>
+			</ul>
+			<%= link_to "Select this spell", select_spell_path(spell), :class => 'remote post conditional when_choosing_spells when_has_not_chosen_spell' %>
 		</div>
 	</li>
 <% end %>

@@ -1,34 +1,34 @@
-"id","name","type","is_persistent","is_in_rotation","image"
-1,"Disbelieve","SpellTypes::DisbelieveSpell","t","f",
-2,"Bat","SpellTypes::CreatureSpell","f","t","creatures/bat.gif"
-3,"Bear","SpellTypes::CreatureSpell","f","t","creatures/bear.gif"
-4,"Centaur","SpellTypes::CreatureSpell","f","t","creatures/centaur.gif"
-5,"Crocodile","SpellTypes::CreatureSpell","f","t","creatures/crocodile.gif"
-6,"Dire Wolf","SpellTypes::CreatureSpell","f","t","creatures/dire_wolf.gif"
-7,"Red Dragon","SpellTypes::CreatureSpell","f","t","creatures/red_dragon.gif"
-8,"Golden Dragon","SpellTypes::CreatureSpell","f","t","creatures/golden_dragon.gif"
-9,"Green Dragon","SpellTypes::CreatureSpell","f","t","creatures/green_dragon.gif"
-10,"Eagle","SpellTypes::CreatureSpell","f","t","creatures/eagle.gif"
-11,"Elf","SpellTypes::CreatureSpell","f","t","creatures/elf.gif"
-12,"Faun","SpellTypes::CreatureSpell","f","t","creatures/faun.gif"
-13,"Ghost","SpellTypes::CreatureSpell","f","t","creatures/ghost.gif"
-14,"Giant","SpellTypes::CreatureSpell","f","t","creatures/giant.gif"
-15,"Giant Rat","SpellTypes::CreatureSpell","f","t","creatures/giant_rat.gif"
-16,"Goblin","SpellTypes::CreatureSpell","f","t","creatures/goblin.gif"
-17,"Gorilla","SpellTypes::CreatureSpell","f","t","creatures/gorilla.gif"
-18,"Gryphon","SpellTypes::CreatureSpell","f","t","creatures/gryphon.gif"
-19,"Harpy","SpellTypes::CreatureSpell","f","t","creatures/harpy.gif"
-20,"Horse","SpellTypes::CreatureSpell","f","t","creatures/horse.gif"
-21,"Hydra","SpellTypes::CreatureSpell","f","t","creatures/hydra.gif"
-22,"King Cobra","SpellTypes::CreatureSpell","f","t","creatures/king_cobra.gif"
-23,"Lion","SpellTypes::CreatureSpell","f","t","creatures/lion.gif"
-24,"Manticore","SpellTypes::CreatureSpell","f","t","creatures/manticore.gif"
-25,"Ogre","SpellTypes::CreatureSpell","f","t","creatures/ogre.gif"
-26,"Orc","SpellTypes::CreatureSpell","f","t","creatures/orc.gif"
-27,"Pegasus","SpellTypes::CreatureSpell","f","t","creatures/pegasus.gif"
-28,"Skeleton","SpellTypes::CreatureSpell","f","t","creatures/skeleton.gif"
-29,"Spectre","SpellTypes::CreatureSpell","f","t","creatures/spectre.gif"
-30,"Unicorn","SpellTypes::CreatureSpell","f","t","creatures/unicorn.gif"
-31,"Vampire","SpellTypes::CreatureSpell","f","t","creatures/vampire.gif"
-32,"Wraith","SpellTypes::CreatureSpell","f","t","creatures/wraith.gif"
-33,"Zombie","SpellTypes::CreatureSpell","f","t","creatures/zombie.gif"
+"id","name","type","is_persistent","is_in_rotation","image","movement_allowance"
+1,"Disbelieve","SpellTypes::DisbelieveSpell","t","f",,
+2,"Bat","SpellTypes::CreatureSpell","f","t","creatures/bat.gif",5
+3,"Bear","SpellTypes::CreatureSpell","f","t","creatures/bear.gif",2
+4,"Centaur","SpellTypes::CreatureSpell","f","t","creatures/centaur.gif",4
+5,"Crocodile","SpellTypes::CreatureSpell","f","t","creatures/crocodile.gif",1
+6,"Dire Wolf","SpellTypes::CreatureSpell","f","t","creatures/dire_wolf.gif",3
+7,"Red Dragon","SpellTypes::CreatureSpell","f","t","creatures/red_dragon.gif",3
+8,"Golden Dragon","SpellTypes::CreatureSpell","f","t","creatures/golden_dragon.gif",3
+9,"Green Dragon","SpellTypes::CreatureSpell","f","t","creatures/green_dragon.gif",3
+10,"Eagle","SpellTypes::CreatureSpell","f","t","creatures/eagle.gif",6
+11,"Elf","SpellTypes::CreatureSpell","f","t","creatures/elf.gif",1
+12,"Faun","SpellTypes::CreatureSpell","f","t","creatures/faun.gif",1
+13,"Ghost","SpellTypes::CreatureSpell","f","t","creatures/ghost.gif",2
+14,"Giant","SpellTypes::CreatureSpell","f","t","creatures/giant.gif",2
+15,"Giant Rat","SpellTypes::CreatureSpell","f","t","creatures/giant_rat.gif",3
+16,"Goblin","SpellTypes::CreatureSpell","f","t","creatures/goblin.gif",1
+17,"Gorilla","SpellTypes::CreatureSpell","f","t","creatures/gorilla.gif",1
+18,"Gryphon","SpellTypes::CreatureSpell","f","t","creatures/gryphon.gif",5
+19,"Harpy","SpellTypes::CreatureSpell","f","t","creatures/harpy.gif",5
+20,"Horse","SpellTypes::CreatureSpell","f","t","creatures/horse.gif",4
+21,"Hydra","SpellTypes::CreatureSpell","f","t","creatures/hydra.gif",1
+22,"King Cobra","SpellTypes::CreatureSpell","f","t","creatures/king_cobra.gif",1
+23,"Lion","SpellTypes::CreatureSpell","f","t","creatures/lion.gif",4
+24,"Manticore","SpellTypes::CreatureSpell","f","t","creatures/manticore.gif",5
+25,"Ogre","SpellTypes::CreatureSpell","f","t","creatures/ogre.gif",1
+26,"Orc","SpellTypes::CreatureSpell","f","t","creatures/orc.gif",1
+27,"Pegasus","SpellTypes::CreatureSpell","f","t","creatures/pegasus.gif",5
+28,"Skeleton","SpellTypes::CreatureSpell","f","t","creatures/skeleton.gif",1
+29,"Spectre","SpellTypes::CreatureSpell","f","t","creatures/spectre.gif",1
+30,"Unicorn","SpellTypes::CreatureSpell","f","t","creatures/unicorn.gif",4
+31,"Vampire","SpellTypes::CreatureSpell","f","t","creatures/vampire.gif",4
+32,"Wraith","SpellTypes::CreatureSpell","f","t","creatures/wraith.gif",2
+33,"Zombie","SpellTypes::CreatureSpell","f","t","creatures/zombie.gif",1

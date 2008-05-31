@@ -118,4 +118,29 @@ class GamesController < ApplicationController
 		end
 	end
 	
+	# GET /games/1/casting_positions
+	def casting_positions
+		@game = Game.find(params[:id])
+		raise "You aren't a player in this game" unless playing?
+		render :json => me.casting_positions
+	end
+	
+	# POST /games/1/cast_spell
+	def cast_spell
+		@game = Game.find(params[:id])
+		raise "You aren't a player in this game" unless playing?
+		observing_game_events do
+			me.cast!(params[:x], params[:y])
+		end
+		announce_event("%s casts %s", me.name, me.next_spell.name)
+	end
+	
+	# POST /games/1/end_turn
+	def end_turn
+		@game = Game.find(params[:id])
+		raise "You aren't a player in this game" unless playing?
+		observing_game_events do
+			me.end_turn
+		end
+	end
 end

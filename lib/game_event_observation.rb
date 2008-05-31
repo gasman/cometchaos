@@ -21,6 +21,13 @@ module GameEventObservation
 		(@players_to_destroy || {}).values.each do |player|
 			player.game.broadcast "removePlayer(#{player.id})"
 		end
+		(@players_to_begin_turn || {}).values.each do |player|
+			if player.game.casting?
+				player.game.broadcast "beginCasting(#{player.id})"
+			elsif player.game.combat?
+				player.game.broadcast "beginCombat(#{player.id})"
+			end
+		end
 		(@games_to_announce || {}).values.each do |game|
 			game_html = render_to_string :partial => 'games/announcement', :object => game
 			Meteor.shoot 'games', "announceGame(#{game.id}, #{game_html.to_json})"
@@ -64,6 +71,16 @@ module GameEventObservation
 		@players_to_put[player.id] = player
 	end
 	def after_player_chooses_spell(player)
+		@players_to_put ||= {}
+		@players_to_put[player.id] = player
+	end
+	def on_player_begin_turn(player)
+		@players_to_put ||= {}
+		@players_to_put[player.id] = player
+		@players_to_begin_turn ||= {}
+		@players_to_begin_turn[player.id] = player
+	end
+	def on_player_end_turn(player)
 		@players_to_put ||= {}
 		@players_to_put[player.id] = player
 	end
