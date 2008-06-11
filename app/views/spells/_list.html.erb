@@ -22,7 +22,10 @@
 					<li>Manoeuvre rating: <%= spell.manoeuvre_rating %></li>
 					<li>Magic resistance: <%= spell.magic_resistance %></li>
 				<% end %>
-				<li>Casting chance: <%= spell.casting_chance %></li>
+				<li>Casting chance: <%= spell.casting_chance %>%</li>
+				<% if !spell.is_a?(Spells::CreatureSpell) %>
+					<li>Range: <%= spell.casting_range %></li>
+				<% end %>
 			</ul>
 			<%= link_to "Select this spell", select_spell_path(spell), :class => 'remote post conditional when_choosing_spells when_has_not_chosen_spell' %>
 		</div>
