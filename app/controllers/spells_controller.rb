@@ -12,7 +12,7 @@ class SpellsController < ApplicationController
 
 	# POST /spells/1/select
 	def select
-		@spell = Spell.find(params[:id], :include => {:player => :game})
+		@spell = Spells::Spell.find(params[:id], :include => {:player => :game})
 		@player = @spell.player
 		@game = @player.game
 		unless playing? and @player == me

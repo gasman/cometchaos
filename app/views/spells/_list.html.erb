@@ -4,9 +4,25 @@
 		<div class="spell_info" id="spell_info_<%= spell.id %>">
 			<h3><%=h spell.name %></h3>
 			<ul>
-				<% if spell.spell_type.is_a?(SpellTypes::CreatureSpell) %>
-					<li>Movement allowance: <%= spell.spell_type.movement_allowance %></li>
+				<% if spell.lawfulness != 0 %>
+					<li><%=h spell.lawfulness_string %></li>
 				<% end %>
+				<% if spell.is_a?(Spells::CreatureSpell) %>
+					<% properties = [] %>
+					<% properties << 'Mountable' if spell.is_mountable? %>
+					<% properties << 'Flying' if spell.is_flying? %>
+					<% properties << 'Undead' if spell.is_undead? %>
+					<% if properties.any? %>
+						<li><%= properties.join('; ') %></li>
+					<% end %>
+					<li>Combat: <%= spell.combat %></li>
+					<li>Ranged combat: <%= spell.ranged_combat %>, range: <%= spell.combat_range %></li>
+					<li>Defence: <%= spell.defence %></li>
+					<li>Movement allowance: <%= spell.movement_allowance %></li>
+					<li>Manoeuvre rating: <%= spell.manoeuvre_rating %></li>
+					<li>Magic resistance: <%= spell.magic_resistance %></li>
+				<% end %>
+				<li>Casting chance: <%= spell.casting_chance %></li>
 			</ul>
 			<%= link_to "Select this spell", select_spell_path(spell), :class => 'remote post conditional when_choosing_spells when_has_not_chosen_spell' %>
 		</div>

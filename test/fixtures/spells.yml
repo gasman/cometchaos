@@ -2,8 +2,8 @@
 
 one:
   player_id: 1
-  spell_type_id: 1
+  spell_variety_id: 1
 
 two:
   player_id: 1
-  spell_type_id: 1
+  spell_variety_id: 1

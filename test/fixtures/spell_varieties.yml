@@ -2,14 +2,14 @@
 
 one:
   name: MyString
-  type: MyString
+  spell_type: MyString
   is_persistent: false
   is_in_rotation: false
   image: MyString
 
 two:
   name: MyString
-  type: MyString
+  spell_type: MyString
   is_persistent: false
   is_in_rotation: false
   image: MyString

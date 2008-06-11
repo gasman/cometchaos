@@ -1,34 +1,61 @@
-"id","name","type","is_persistent","is_in_rotation","image","movement_allowance"
-1,"Disbelieve","SpellTypes::DisbelieveSpell","t","f",,
-2,"Bat","SpellTypes::CreatureSpell","f","t","creatures/bat.gif",5
-3,"Bear","SpellTypes::CreatureSpell","f","t","creatures/bear.gif",2
-4,"Centaur","SpellTypes::CreatureSpell","f","t","creatures/centaur.gif",4
-5,"Crocodile","SpellTypes::CreatureSpell","f","t","creatures/crocodile.gif",1
-6,"Dire Wolf","SpellTypes::CreatureSpell","f","t","creatures/dire_wolf.gif",3
-7,"Red Dragon","SpellTypes::CreatureSpell","f","t","creatures/red_dragon.gif",3
-8,"Golden Dragon","SpellTypes::CreatureSpell","f","t","creatures/golden_dragon.gif",3
-9,"Green Dragon","SpellTypes::CreatureSpell","f","t","creatures/green_dragon.gif",3
-10,"Eagle","SpellTypes::CreatureSpell","f","t","creatures/eagle.gif",6
-11,"Elf","SpellTypes::CreatureSpell","f","t","creatures/elf.gif",1
-12,"Faun","SpellTypes::CreatureSpell","f","t","creatures/faun.gif",1
-13,"Ghost","SpellTypes::CreatureSpell","f","t","creatures/ghost.gif",2
-14,"Giant","SpellTypes::CreatureSpell","f","t","creatures/giant.gif",2
-15,"Giant Rat","SpellTypes::CreatureSpell","f","t","creatures/giant_rat.gif",3
-16,"Goblin","SpellTypes::CreatureSpell","f","t","creatures/goblin.gif",1
-17,"Gorilla","SpellTypes::CreatureSpell","f","t","creatures/gorilla.gif",1
-18,"Gryphon","SpellTypes::CreatureSpell","f","t","creatures/gryphon.gif",5
-19,"Harpy","SpellTypes::CreatureSpell","f","t","creatures/harpy.gif",5
-20,"Horse","SpellTypes::CreatureSpell","f","t","creatures/horse.gif",4
-21,"Hydra","SpellTypes::CreatureSpell","f","t","creatures/hydra.gif",1
-22,"King Cobra","SpellTypes::CreatureSpell","f","t","creatures/king_cobra.gif",1
-23,"Lion","SpellTypes::CreatureSpell","f","t","creatures/lion.gif",4
-24,"Manticore","SpellTypes::CreatureSpell","f","t","creatures/manticore.gif",5
-25,"Ogre","SpellTypes::CreatureSpell","f","t","creatures/ogre.gif",1
-26,"Orc","SpellTypes::CreatureSpell","f","t","creatures/orc.gif",1
-27,"Pegasus","SpellTypes::CreatureSpell","f","t","creatures/pegasus.gif",5
-28,"Skeleton","SpellTypes::CreatureSpell","f","t","creatures/skeleton.gif",1
-29,"Spectre","SpellTypes::CreatureSpell","f","t","creatures/spectre.gif",1
-30,"Unicorn","SpellTypes::CreatureSpell","f","t","creatures/unicorn.gif",4
-31,"Vampire","SpellTypes::CreatureSpell","f","t","creatures/vampire.gif",4
-32,"Wraith","SpellTypes::CreatureSpell","f","t","creatures/wraith.gif",2
-33,"Zombie","SpellTypes::CreatureSpell","f","t","creatures/zombie.gif",1
+"id","name","spell_type","is_persistent","is_in_rotation","image","casting_chance","lawfulness","is_mountable","is_flying","is_undead","combat","ranged_combat","combat_range","defence","movement_allowance","manoeuvre_rating","magic_resistance","casting_range"
+1,"Disbelieve","DisbelieveSpell","t","f",,100,0,,,,,,,,,,,20
+2,"Bat","CreatureSpell","f","t","creatures/bat.gif",80,-1,"f","t","f",1,0,0,1,5,9,4,1
+3,"Bear","CreatureSpell","f","t","creatures/bear.gif",60,1,"f","f","f",6,0,0,7,2,6,2,1
+4,"Centaur","CreatureSpell","f","t","creatures/centaur.gif",70,1,"t","f","f",1,2,4,3,4,5,5,1
+5,"Crocodile","CreatureSpell","f","t","creatures/crocodile.gif",80,0,"f","f","f",5,0,0,6,1,2,2,1
+6,"Dire Wolf","CreatureSpell","f","t","creatures/dire_wolf.gif",90,-1,"f","f","f",3,0,0,2,3,7,2,1
+7,"Red Dragon","CreatureSpell","f","t","creatures/red_dragon.gif",10,-2,"f","t","f",7,3,5,9,3,4,5,1
+8,"Golden Dragon","CreatureSpell","f","t","creatures/golden_dragon.gif",10,2,"f","t","f",9,5,4,9,3,5,5,1
+9,"Green Dragon","CreatureSpell","f","t","creatures/green_dragon.gif",10,-1,"f","t","f",5,4,6,8,3,4,4,1
+10,"Eagle","CreatureSpell","f","t","creatures/eagle.gif",70,1,"f","t","f",3,0,0,3,6,8,2,1
+11,"Elf","CreatureSpell","f","t","creatures/elf.gif",70,2,"f","f","f",1,2,6,2,1,5,7,1
+12,"Faun","CreatureSpell","f","t","creatures/faun.gif",80,-1,"f","f","f",3,0,0,2,1,7,8,1
+13,"Ghost","CreatureSpell","f","t","creatures/ghost.gif",50,-1,"f","t","t",1,0,0,3,2,9,6,1
+14,"Giant","CreatureSpell","f","t","creatures/giant.gif",40,1,"f","f","f",9,0,0,7,2,6,5,1
+15,"Giant Rat","CreatureSpell","f","t","creatures/giant_rat.gif",100,0,"f","f","f",1,0,0,1,3,8,2,1
+16,"Goblin","CreatureSpell","f","t","creatures/goblin.gif",90,-1,"f","f","f",2,0,0,4,1,4,4,1
+17,"Gorilla","CreatureSpell","f","t","creatures/gorilla.gif",70,0,"f","f","f",6,0,0,5,1,4,2,1
+18,"Gryphon","CreatureSpell","f","t","creatures/gryphon.gif",60,1,"t","t","f",3,0,0,5,5,5,6,1
+19,"Harpy","CreatureSpell","f","t","creatures/harpy.gif",60,-1,"f","t","f",4,0,0,2,5,8,5,1
+20,"Horse","CreatureSpell","f","t","creatures/horse.gif",90,1,"t","f","f",1,0,0,3,4,8,1,1
+21,"Hydra","CreatureSpell","f","t","creatures/hydra.gif",50,-1,"f","f","f",7,0,0,8,1,4,6,1
+22,"King Cobra","CreatureSpell","f","t","creatures/king_cobra.gif",90,1,"f","f","f",4,0,0,1,1,6,1,1
+23,"Lion","CreatureSpell","f","t","creatures/lion.gif",60,1,"f","f","f",6,0,0,4,4,8,3,1
+24,"Manticore","CreatureSpell","f","t","creatures/manticore.gif",40,-1,"t","t","f",3,1,3,6,5,6,8,1
+25,"Ogre","CreatureSpell","f","t","creatures/ogre.gif",70,-1,"f","f","f",4,0,0,7,1,3,6,1
+26,"Orc","CreatureSpell","f","t","creatures/orc.gif",100,-1,"f","f","f",2,0,0,1,1,4,4,1
+27,"Pegasus","CreatureSpell","f","t","creatures/pegasus.gif",60,2,"t","t","f",2,0,0,4,5,6,7,1
+28,"Skeleton","CreatureSpell","f","t","creatures/skeleton.gif",70,-1,"f","f","t",3,0,0,2,1,3,4,1
+29,"Spectre","CreatureSpell","f","t","creatures/spectre.gif",60,-1,"f","f","t",4,0,0,2,1,6,4,1
+30,"Unicorn","CreatureSpell","f","t","creatures/unicorn.gif",60,2,"t","f","f",5,0,0,4,4,9,7,1
+31,"Vampire","CreatureSpell","f","t","creatures/vampire.gif",20,-2,"f","t","t",6,0,0,8,4,6,5,1
+32,"Wraith","CreatureSpell","f","t","creatures/wraith.gif",50,-1,"f","f","t",5,0,0,5,2,4,5,1
+33,"Zombie","CreatureSpell","f","t","creatures/zombie.gif",90,-1,"f","f","t",1,0,0,1,1,2,3,1
+34,"Magic Wood","MagicWoodSpell","f","t",,80,1,,,,,,,,,,,8
+35,"Chaos-2","LawfulnessSpell","f","t",,60,-4,,,,,,,,,,,0
+36,"Magic Sword","EquipmentSpell","f","t",,40,1,,,,,,,,,,,0
+37,"Magic Fire","MagicFireSpell","f","t",,80,-1,,,,,,,,,,,6
+38,"Shadow Form","ShadowFormSpell","f","t",,70,0,,,,,,,,,,,0
+39,"Subversion","SubversionSpell","f","t",,100,0,,,,,,,,,,,7
+40,"Wall","WallSpell","f","t",,80,0,,,,,,,,,,,6
+41,"Dark Citadel","CastleSpell","f","t",,50,-1,,,,,,,,,,,8
+42,"Magic Knife","EquipmentSpell","f","t",,70,1,,,,,,,,,,,0
+43,"Magic Castle","CastleSpell","f","t",,50,1,,,,,,,,,,,8
+44,"Magic Shield","EquipmentSpell","f","t",,70,1,,,,,,,,,,,0
+45,"Magic Wings","EquipmentSpell","f","t",,50,0,,,,,,,,,,,0
+46,"Magic Armour","EquipmentSpell","f","t",,40,1,,,,,,,,,,,0
+47,"Shadow Wood","ShadowWoodSpell","f","t",,40,-1,,,,,,,,,,,8
+48,"Law-2","LawfulnessSpell","f","t",,60,4,,,,,,,,,,,0
+49,"Dark Power","PurgeSpell","f","t",,50,-2,,,,,,,,,,,20
+50,"Magic Bolt","LightningSpell","f","t",,100,0,,,,,,,,,,,6
+51,"Raise Dead","RaiseDeadSpell","f","t",,50,-1,,,,,,,,,,,4
+52,"Lightning","LightningSpell","f","t",,100,0,,,,,,,,,,,4
+53,"Law-1","LawfulnessSpell","f","t",,80,2,,,,,,,,,,,0
+54,"Justice","PurgeSpell","f","t",,50,2,,,,,,,,,,,20
+55,"Chaos-1","LawfulnessSpell","f","t",,90,2,,,,,,,,,,,0
+56,"Vengeance","PurgeSpell","f","t",,80,-1,,,,,,,,,,,20
+57,"Gooey Blob","GooeyBlobSpell","f","t",,90,-1,,,,,,,,,,,6
+58,"Magic Bow","EquipmentSpell","f","t",,50,1,,,,,,,,,,,0
+59,"Decree","PurgeSpell","f","t",,90,1,,,,,,,,,,,20
+60,"Turmoil","TurmoilSpell","f","f",,50,-1,,,,,,,,,,,

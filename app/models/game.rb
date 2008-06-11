@@ -97,17 +97,17 @@ class Game < ActiveRecord::Base
 	end
 	
 	def distribute_spells
-		persistent_spell_types = SpellTypes::SpellType.find(:all,
+		persistent_spell_varieties = SpellVariety.find(:all,
 			:conditions => "is_persistent = 't'")
-		spell_types_in_rotation = SpellTypes::SpellType.find(:all,
+		spell_varieties_in_rotation = SpellVariety.find(:all,
 			:conditions => "is_in_rotation = 't'")
 
 		players.each do |player|
 			# provide one each of the persistent spell types
-			player.spells << persistent_spell_types.collect{|typ| Spell.new(:spell_type => typ)}
+			player.spells << persistent_spell_varieties.collect{|variety| variety.instantiate}
 			# and between 12 and 15 of the others
 			(12 + rand(4)).times do
-				player.spells << Spell.new(:spell_type => spell_types_in_rotation.rand)
+				player.spells << spell_varieties_in_rotation.rand.instantiate
 			end
 		end
 	end

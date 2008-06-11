@@ -32,13 +32,13 @@
 </div>
 
 <div id="sidebar">
-	<div id="title_panel">
+	<div id="title_panel" class="panel">
 		<h1>Chaos</h1>
 		<h2>The Battle Of Wizards</h2>
 		<h3>Game <%= @game.id %> - <span id="game_status"></span></h3>
 	</div>
 	
-	<div id="players_panel">
+	<div id="players_panel" class="panel">
 		<h2>Players</h2>
 		<ul id="players_list">
 			<%= render :partial => 'player', :collection => @game.players,

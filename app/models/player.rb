@@ -1,12 +1,12 @@
 class Player < ActiveRecord::Base
 	belongs_to :game
-	has_many :spells, :include => :spell_type
+	has_many :spells, :class_name => 'Spells::Spell', :include => :spell_variety
 	acts_as_list :scope => :game
 	
 	has_many :sprites, :dependent => :destroy
 	has_one :wizard_sprite, :class_name => 'Sprite', :conditions => "is_wizard = 't'"
 	
-	belongs_to :next_spell, :class_name => 'Spell', :foreign_key => 'next_spell_id'
+	belongs_to :next_spell, :class_name => 'Spells::Spell', :foreign_key => 'next_spell_id'
 	
 	attr_protected :is_operator, :next_spell, :next_spell_id, :has_chosen_spell
 	
