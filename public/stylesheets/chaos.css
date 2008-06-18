@@ -86,6 +86,13 @@ body {
 	#board .move_position:hover {
 		background-color: #666666;
 	}
+	
+	#board .bolt {
+		position: absolute;
+		width: 4px;
+		height: 4px;
+		background-color: white;
+	}
 
 #sidebar {
 	margin-left: 520px;

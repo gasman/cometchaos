@@ -12,6 +12,12 @@ module GameEventObservation
 		
 		global_responses = ''
 		game_responses = ''
+		
+		# do this first so that after-effects of the spell happen after it
+		for_spells_triggering(:on_cast) do |spell|
+			wizard = spell.player.wizard_sprite
+			game_responses << "fireBolt(#{wizard.x}, #{wizard.y}, #{spell.target_x}, #{spell.target_y});"
+		end
 
 		for_players_triggering(:after_create) do |player|
 			player_html = render_to_string :partial => 'games/player', :object => player
@@ -73,8 +79,6 @@ module GameEventObservation
 			game_responses << "endCasting(#{player.id});"
 		end
 		
-		# TODO: 'cast spell' event
-
 		for_players_triggering(:on_begin_fighting) do |player|
 			game_responses << "beginFighting(#{player.id});"
 		end

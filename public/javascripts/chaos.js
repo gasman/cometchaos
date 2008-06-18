@@ -282,6 +282,41 @@ function logEvent(html) {
 	jq('#events_list').append(li);
 }
 
+BOLT_SIZE = 20;
+BOLT_SPEED = 9; /* frames per unit distance */
+
+function fireBolt(x0, y0, x1, y1) {
+	var dx = x1 - x0;
+	var dy = y1 - y0;
+	if (dx == 0 && dy == 0) {
+		return;
+	}
+	var distance = Math.sqrt(dx*dx + dy*dy);
+	var frameCount = Math.floor(distance * BOLT_SPEED);
+	boltStep(0, [], frameCount, x0, y0, x1, y1);
+}
+function boltStep(frameNumber, sprites, frameCount, x0, y0, x1, y1) {
+	if (frameNumber < frameCount) {
+		if (frameNumber < BOLT_SIZE) {
+			sprites[frameNumber] = jq('<div class="bolt"></div>');
+		}
+		var progress = frameNumber / frameCount;
+		var x = progress*x1 + (1-progress)*x0;
+		var y = progress*y1 + (1-progress)*y0;
+		sprites[frameNumber % BOLT_SIZE].css({'left': (32+x*32)+'px', 'top': (32+y*32)+'px'});;
+		if (frameNumber < BOLT_SIZE) {
+			jq('#board').append(sprites[frameNumber]);
+		}
+	} else {
+		if (sprites[frameNumber % BOLT_SIZE] != null) {
+			sprites[frameNumber % BOLT_SIZE].remove();
+		}
+	}
+	if (frameNumber < frameCount + BOLT_SIZE) {
+		setTimeout(function() {boltStep(frameNumber + 1, sprites, frameCount, x0, y0, x1, y1)}, 10);
+	}
+}
+
 /* end of events */
 
 function applySpellAnchors() {
