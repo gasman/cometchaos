@@ -17,6 +17,26 @@ var useTransitions = false;
 var gameState;
 var selectedSpriteForMovement = null;
 
+/* event chaining */
+var pendingEvents = [];
+var isExecutingEvents = false;
+function chain(fn) {
+	if (isExecutingEvents) {
+		pendingEvents.push(fn);
+	} else {
+		/* event functions return false if they're still running asynchronously;
+		they'll return nextEvent when complete */
+		isExecutingEvents = !fn();
+	}
+}
+function nextEvent() {
+	while (fn = pendingEvents.shift()) {
+		isExecutingEvents = !fn();
+		if (isExecutingEvents) return;
+	}
+	isExecutingEvents = false;
+}
+
 function showConditionalFurniture() {
 	jq('.conditional').each(function() {
 		var elem = jq(this);
@@ -86,114 +106,153 @@ function findHttpMethodClass(elem) {
 /* Event actions */
 
 function becomePlayer(id) {
-	myPlayerId = id;
-	jq('#player_'+id).addClass('me');
-	personalState = 'waiting';
-	showConditionalFurniture();
+	chain(function() {
+		myPlayerId = id;
+		jq('#player_'+id).addClass('me');
+		personalState = 'waiting';
+		showConditionalFurniture();
+		return true;
+	});
 }
 
 function putPlayer(id, html) {
-	var newPlayer = applyAvatarRollover(applyFormRemoting(jq(html)));
-	if (id == myPlayerId) {
-		newPlayer.addClass('me');
-		/* makeMyNameEditable(); */
-	}
-
-	var player = jq('#player_'+id);
-	if (player.length) {
-		player.replaceWith(newPlayer);
-	} else {
-		newPlayer.hide();
-		jq('#players_list').append(newPlayer);
-		newPlayer.slideDown();
-	}
+	chain(function() {
+		var newPlayer = applyAvatarRollover(applyFormRemoting(jq(html)));
+		if (id == myPlayerId) {
+			newPlayer.addClass('me');
+			/* makeMyNameEditable(); */
+		}
+	
+		var player = jq('#player_'+id);
+		if (player.length) {
+			player.replaceWith(newPlayer);
+		} else {
+			newPlayer.hide();
+			jq('#players_list').append(newPlayer);
+			newPlayer.slideDown();
+		}
+		return true;
+	});
 }
 
 function removePlayer(id) {
-	jq('#player_'+id).slideUp('normal', function() {jq(this).remove()});
-	if (id == myPlayerId) {
-		myPlayerId = null;
-		isOperator = false;
-		personalState = 'nonplayer';
-		showConditionalFurniture();
-	}
+	chain(function() {
+		jq('#player_'+id).slideUp('normal', function() {jq(this).remove()});
+		if (id == myPlayerId) {
+			myPlayerId = null;
+			isOperator = false;
+			personalState = 'nonplayer';
+			showConditionalFurniture();
+		}
+		return true;
+	});
 }
 
 function setGameStartable(state) {
-	gameIsStartable = state;
-	showConditionalFurniture();
+	chain(function() {
+		gameIsStartable = state;
+		showConditionalFurniture();
+		return true;
+	});
 }
 
 function setGameJoinable(state) {
-	gameIsJoinable = state;
-	showConditionalFurniture();
+	chain(function() {
+		gameIsJoinable = state;
+		showConditionalFurniture();
+		return true;
+	});
 }
 
 function announceGame(id, html) {
-	var game = jq('#game_'+id);
-	if (game.length) {
-		game.replaceWith(html);
-	} else {
-		game = jq(html).hide();
-		jq('#games_list').append(game);
-		game.slideDown();
-	}
+	chain(function() {
+		var game = jq('#game_'+id);
+		if (game.length) {
+			game.replaceWith(html);
+		} else {
+			game = jq(html).hide();
+			jq('#games_list').append(game);
+			game.slideDown();
+		}
+		return true;
+	});
 }
 
 function assignOperator(id) {
-	jq('#player_'+id).addClass('operator');
-	if (id == myPlayerId) {
-		isOperator = true;
-		showConditionalFurniture();
-	}
+	chain(function() {
+		jq('#player_'+id).addClass('operator');
+		if (id == myPlayerId) {
+			isOperator = true;
+			showConditionalFurniture();
+		}
+		return true;
+	});
 }
 
 function revokeOperator(id) {
-	jq('#player_'+id).removeClass('operator');
-	if (id == myPlayerId) {
-		isOperator = false;
-		showConditionalFurniture();
-	}
+	chain(function() {
+		jq('#player_'+id).removeClass('operator');
+		if (id == myPlayerId) {
+			isOperator = false;
+			showConditionalFurniture();
+		}
+		return true;
+	});
 }
 
 function startGame() {
-	gameHasStarted = true;
-	gameIsStartable = false;
-	gameIsJoinable = false;
-	/* fetch spells */
-	jq('#spells_list').load('/games/' + gameId + '/spells', null, applySpellAnchors);
-	showConditionalFurniture();
+	chain(function() {
+		gameHasStarted = true;
+		gameIsStartable = false;
+		gameIsJoinable = false;
+		/* fetch spells */
+		jq('#spells_list').load('/games/' + gameId + '/spells', null, applySpellAnchors);
+		showConditionalFurniture();
+		return true;
+	});
 }
 
 function beginChoosingSpells() {
-	jq('#players_list > li').addClass('awaiting_action');
-	if (myPlayerId != null) {
-		personalState = 'choosing_spells';
-		showConditionalFurniture();
-	}
+	chain(function() {
+		jq('#players_list > li').addClass('awaiting_action');
+		if (myPlayerId != null) {
+			personalState = 'choosing_spells';
+			showConditionalFurniture();
+		}
+		return true;
+	});
 }
 
 function endChoosingSpells(id) {
-	jq('#player_'+id).removeClass('awaiting_action');
-	if (id == myPlayerId) {
-		personalState = 'waiting';
-		showConditionalFurniture();
-	}
+	chain(function() {
+		jq('#player_'+id).removeClass('awaiting_action');
+		if (id == myPlayerId) {
+			personalState = 'waiting';
+			showConditionalFurniture();
+		}
+		return true;
+	});
 }
 
 function markSpellAsChosen(id, html) {
-	jq('#next_spell').html(html);
-	hasPendingSpell = true;
-	showConditionalFurniture();
+	chain(function() {
+		jq('#next_spell').html(html);
+		hasPendingSpell = true;
+		showConditionalFurniture();
+		return true;
+	});
 }
 
 function beginCasting(playerId) {
-	jq('#player_' + playerId).addClass('awaiting_action');
-	if (myPlayerId == playerId) {
-		personalState = 'casting';
-		jq.get('/games/' + gameId + '/casting_positions', null, showCastingPositions, 'json');
-		showConditionalFurniture();
-	}
+	chain(function() {
+		jq('#player_' + playerId).addClass('awaiting_action');
+		if (myPlayerId == playerId) {
+			personalState = 'casting';
+			jq.get('/games/' + gameId + '/casting_positions', null, showCastingPositions, 'json');
+			showConditionalFurniture();
+		}
+		return true;
+	});
 }
 function showCastingPositions(positions) {
 	for (var i = 0; i < positions.length; i++) {
@@ -211,89 +270,113 @@ function insertCastingPosition(x,y) {
 }
 
 function discardSpell(id) {
-	jq('#spell_'+id).slideUp();
-	hasPendingSpell = false;
-	showConditionalFurniture();
+	chain(function() {
+		jq('#spell_'+id).slideUp();
+		hasPendingSpell = false;
+		showConditionalFurniture();
+		return true;
+	});
 }
 
 function endCasting(playerId) {
-	jq('#player_' + playerId).removeClass('awaiting_action');
-	if (myPlayerId == playerId) {
-		jq('#board .casting_position').remove();
-		personalState = 'waiting';
-		showConditionalFurniture();
-	}
+	chain(function() {
+		jq('#player_' + playerId).removeClass('awaiting_action');
+		if (myPlayerId == playerId) {
+			jq('#board .casting_position').remove();
+			personalState = 'waiting';
+			showConditionalFurniture();
+		}
+		return true;
+	});
 }
 
 function beginFighting(playerId) {
-	jq('#player_' + playerId).addClass('awaiting_action');
-	if (myPlayerId == playerId) {
-		personalState = 'fighting';
-		showConditionalFurniture();
-	}
+	chain(function() {
+		jq('#player_' + playerId).addClass('awaiting_action');
+		if (myPlayerId == playerId) {
+			personalState = 'fighting';
+			showConditionalFurniture();
+		}
+		return true;
+	});
 }
 
 function endFighting(playerId) {
-	jq('#player_' + playerId).removeClass('awaiting_action');
-	if (myPlayerId == playerId) {
-		jq('#board .move_position').remove();
-		personalState = 'waiting';
-		showConditionalFurniture();
-	}
+	chain(function() {
+		jq('#player_' + playerId).removeClass('awaiting_action');
+		if (myPlayerId == playerId) {
+			jq('#board .move_position').remove();
+			personalState = 'waiting';
+			showConditionalFurniture();
+		}
+		return true;
+	});
 }
 
 function putSprite(id, img, x, y, playerId) {
-	var sprite = jq('#sprite_'+id);
-	if (!sprite.length) {
-		sprite = jq('<img class="sprite owned_by_player_'+playerId+'" width="32" height="32" alt="" />').attr('id', 'sprite_'+id);
-		jq('#board').append(sprite);
-		if (myPlayerId == playerId) {
-			sprite.hover(function() {
-				if (personalState == 'fighting') {
-					jq(this).addClass('highlight');
-				}
-			}, function() {
-				jq(this).removeClass('highlight');
-			});
-			sprite.click(function() {
-				if (personalState == 'fighting') {
-					if (selectedSpriteForMovement == null) {
-						/* clicked on sprite to start movement */
-						selectedSpriteForMovement = id;
-						jq.get('/sprites/' + id + '/move_positions', null,
-							function(positions) {showMovePositions(id, positions)}, 'json');
-					} else if (selectedSpriteForMovement == id) {
-						/* clicked on sprite again to cancel movement */
-						selectedSpriteForMovement = null;
-						jq('#board .move_position').remove();
+	chain(function() {
+		var sprite = jq('#sprite_'+id);
+		if (!sprite.length) {
+			sprite = jq('<img class="sprite owned_by_player_'+playerId+'" width="32" height="32" alt="" />').attr('id', 'sprite_'+id);
+			jq('#board').append(sprite);
+			if (myPlayerId == playerId) {
+				sprite.hover(function() {
+					if (personalState == 'fighting') {
+						jq(this).addClass('highlight');
 					}
-				}
-			});
+				}, function() {
+					jq(this).removeClass('highlight');
+				});
+				sprite.click(function() {
+					if (personalState == 'fighting') {
+						if (selectedSpriteForMovement == null) {
+							/* clicked on sprite to start movement */
+							selectedSpriteForMovement = id;
+							jq.get('/sprites/' + id + '/move_positions', null,
+								function(positions) {showMovePositions(id, positions)}, 'json');
+						} else if (selectedSpriteForMovement == id) {
+							/* clicked on sprite again to cancel movement */
+							selectedSpriteForMovement = null;
+							jq('#board .move_position').remove();
+						}
+					}
+				});
+			}
 		}
-	}
-	sprite.attr('src', img).css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
+		sprite.attr('src', img).css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
+		return true;
+	});
 }
 function removeSprite(id) {
-	jq('#sprite_'+id).remove();
+	chain(function() {
+		jq('#sprite_'+id).remove();
+		return true;
+	});
 }
 
 function logEvent(html) {
-	var li = jq('<li></li>').append(html);
-	jq('#events_list').append(li);
+	chain(function() {
+		var li = jq('<li></li>').append(html);
+		jq('#events_list').append(li);
+		return true;
+	});
 }
 
 BOLT_SIZE = 20;
 BOLT_SPEED = 9; /* frames per unit distance */
 
 function fireBolt(x0, y0, x1, y1) {
-	var dx = x1 - x0;
-	var dy = y1 - y0;
-	if (dx == 0 && dy == 0) {
-		return;
-	}
-	var distance = Math.sqrt(dx*dx + dy*dy);
-	var frameCount = Math.floor(distance * BOLT_SPEED);
-	boltStep(0, [], frameCount, x0, y0, x1, y1);
+	chain(function() {
+		var dx = x1 - x0;
+		var dy = y1 - y0;
+		if (dx == 0 && dy == 0) {
+			return;
+		}
+		var distance = Math.sqrt(dx*dx + dy*dy);
+		var frameCount = Math.floor(distance * BOLT_SPEED);
+		boltStep(0, [], frameCount, x0, y0, x1, y1);
+		return false;
+	});
 }
 function boltStep(frameNumber, sprites, frameCount, x0, y0, x1, y1) {
 	if (frameNumber < frameCount) {
@@ -314,6 +397,8 @@ function boltStep(frameNumber, sprites, frameCount, x0, y0, x1, y1) {
 	}
 	if (frameNumber < frameCount + BOLT_SIZE) {
 		setTimeout(function() {boltStep(frameNumber + 1, sprites, frameCount, x0, y0, x1, y1)}, 10);
+	} else {
+		nextEvent();
 	}
 }
 
