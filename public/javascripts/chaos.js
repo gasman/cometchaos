@@ -247,27 +247,29 @@ function putSprite(id, img, x, y, playerId) {
 	if (!sprite.length) {
 		sprite = jq('<img class="sprite owned_by_player_'+playerId+'" width="32" height="32" alt="" />').attr('id', 'sprite_'+id);
 		jq('#board').append(sprite);
-		sprite.hover(function() {
-			if (personalState == 'fighting') {
-				jq(this).addClass('highlight');
-			}
-		}, function() {
-			jq(this).removeClass('highlight');
-		});
-		sprite.click(function() {
-			if (personalState == 'fighting') {
-				if (selectedSpriteForMovement == null) {
-					/* clicked on sprite to start movement */
-					selectedSpriteForMovement = id;
-					jq.get('/sprites/' + id + '/move_positions', null,
-						function(positions) {showMovePositions(id, positions)}, 'json');
-				} else if (selectedSpriteForMovement == id) {
-					/* clicked on sprite again to cancel movement */
-					selectedSpriteForMovement = null;
-					jq('#board .move_position').remove();
+		if (myPlayerId == playerId) {
+			sprite.hover(function() {
+				if (personalState == 'fighting') {
+					jq(this).addClass('highlight');
 				}
-			}
-		});
+			}, function() {
+				jq(this).removeClass('highlight');
+			});
+			sprite.click(function() {
+				if (personalState == 'fighting') {
+					if (selectedSpriteForMovement == null) {
+						/* clicked on sprite to start movement */
+						selectedSpriteForMovement = id;
+						jq.get('/sprites/' + id + '/move_positions', null,
+							function(positions) {showMovePositions(id, positions)}, 'json');
+					} else if (selectedSpriteForMovement == id) {
+						/* clicked on sprite again to cancel movement */
+						selectedSpriteForMovement = null;
+						jq('#board .move_position').remove();
+					}
+				}
+			});
+		}
 	}
 	sprite.attr('src', img).css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
 }
