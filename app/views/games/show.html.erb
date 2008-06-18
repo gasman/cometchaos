@@ -29,6 +29,9 @@
 			<li class="conditional when_my_turn">
 				<%= link_to 'End turn', end_turn_game_path, :class => 'remote post' %>
 			</li>
+			<li class="conditional for_operator when_game_is_startable">
+				<%= link_to 'Start game', start_game_path, :class => 'remote post' %>
+			</li>
 		</ul>
 		<span id="prompt_message">
 			<% if @game.open? %>
@@ -77,9 +80,6 @@
 					<%= f.submit 'Join' %>
 				<% end %>
 			</div>
-		</div>
-		<div class="conditional panel for_operator when_game_is_startable">
-			<%= link_to 'Start game', start_game_path, :class => 'remote post' %>
 		</div>
 	</div>
 	
