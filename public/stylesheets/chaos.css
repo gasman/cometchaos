@@ -196,7 +196,7 @@ body {
 	padding: 8px 0;
 }
 #spells_panel ul#spells_list {
-	width: 50%;
+	width: 45%;
 	float: left;
 	margin: 0 8px 8px 8px;
 	font-size: 9pt;
@@ -210,6 +210,11 @@ body {
 }
 #spells_panel ul#spells_list li .spell_info {
 	display: none;
+}
+
+#spells_panel #spell_info_view {
+	width: 45%;
+	float: right;
 }
 
 #spells_panel #next_spell {
