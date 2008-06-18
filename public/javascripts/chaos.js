@@ -165,7 +165,7 @@ function startGame() {
 	showConditionalFurniture();
 }
 
-function startChoosingSpells() {
+function beginChoosingSpells() {
 	jq('#players_list > li').addClass('awaiting_action');
 	if (myPlayerId != null) {
 		personalState = 'choosing_spells';
@@ -282,29 +282,7 @@ function logEvent(html) {
 	jq('#events_list').append(li);
 }
 
-function setGameState(state) {
-	gameState = state;
-	showGameState();
-	if (gameState == 'choosing_spells') {
-		jq('#players_list > li').addClass('awaiting_action');
-		hasPendingSpell = false;
-		hasChosenSpell = false;
-	}
-	showConditionalFurniture();
-}
-function showGameState() {
-	if (gameState == 'open') {
-		jq('#game_status').text('Open for joining');
-	} else if (gameState == 'choosing_spells') {
-		jq('#game_status').text('Choosing spells');
-	} else if (gameState == 'casting') {
-		jq('#game_status').text('Spellcasting');
-	} else if (gameState == 'combat') {
-		jq('#game_status').text('Combat');
-	} else {
-		jq('#game_status').text('unknown... (' + gameState + ')');
-	}
-}
+/* end of events */
 
 function applySpellAnchors() {
 	jq('#spells_list a.spell').click(function() {
@@ -354,7 +332,6 @@ jq(function() {
 	applyFormRemoting();
 	jq('#players_list .player').each(function() {applyAvatarRollover(jq(this))});
 	applySpellAnchors();
-	showGameState();
 	showConditionalFurniture();
 	useTransitions = true; /* OK to use transitions after initial page load */
 });

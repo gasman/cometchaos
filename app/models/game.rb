@@ -28,17 +28,17 @@ class Game < ActiveRecord::Base
 	
 	# state machine behaviour
 	state :open, :exit => :game_start_actions
-	state :choosing_spells, :enter => :start_choosing_spells
-	state :casting, :enter => :start_casting
-	state :combat, :enter => :start_combat
+	state :choosing_spells, :enter => :begin_choosing_spells
+	state :casting, :enter => :begin_casting
+	state :fighting, :enter => :begin_fighting
 	
 	event :start do
 		transitions :from => :open, :to => :choosing_spells
 	end
 	event :continue do
 		transitions :from => :choosing_spells, :to => :casting, :guard => lambda {|game| game.players.all?(&:has_chosen_spell?) }
-		transitions :from => :casting, :to => :combat, :guard => lambda {|game| game.players_with_spells_to_cast(true).empty? }
-		transitions :from => :combat, :to => :choosing_spells, :guard => lambda {|game| game.current_player == game.players.last }
+		transitions :from => :casting, :to => :fighting, :guard => lambda {|game| game.players_with_spells_to_cast(true).empty? }
+		transitions :from => :fighting, :to => :choosing_spells, :guard => lambda {|game| game.current_player == game.players.last }
 	end
 	
 	# to facilitate observing all objects relating to a specific game
@@ -68,7 +68,7 @@ class Game < ActiveRecord::Base
 	end
 	
 	def add_player(player)
-		# we can't simply run set_wizard_start_positions on the players collection after
+		# we can't simply run set_wizard_start_positions on the players collection after
 		# appending the new player, because that will return a new instance of player,
 		# and consequently a new instance of sprite, and therefore the old instance of
 		# sprite will be sitting around in the observer's queue with no coordinates.
@@ -105,7 +105,7 @@ class Game < ActiveRecord::Base
 				# all players have cast spells
 				self.continue!
 			end
-		elsif self.combat?
+		elsif self.fighting?
 			next_player = players.find(:first,
 				:conditions => ['position > ?', current_player.position])
 			if next_player
@@ -152,15 +152,15 @@ class Game < ActiveRecord::Base
 		end
 	end
 	
-	def start_choosing_spells
+	def begin_choosing_spells
 		self.players.each do |player|
 			player.update_attribute(:has_chosen_spell, false)
 			player.update_attribute(:next_spell_id, nil)
 		end
-		callback :on_start_choosing_spells
+		callback :on_begin_choosing_spells
 	end
 	
-	def start_casting
+	def begin_casting
 		if players_with_spells_to_cast.any?
 			self.current_player = players_with_spells_to_cast.first
 			save!
@@ -171,7 +171,7 @@ class Game < ActiveRecord::Base
 		change_state_actions
 	end
 
-	def start_combat
+	def begin_fighting
 		# need to reload sprites association, because a sprite may have been added
 		# outside of the game model in this current request
 		sprites(true).each do |sprite|

@@ -97,7 +97,7 @@ class Player < ActiveRecord::Base
 		# elsif self.dead? then :waiting # TODO: add this when we have a 'dead' status
 		elsif game.choosing_spells? and !self.has_chosen_spell then :choosing_spells
 		elsif game.casting? and game.current_player == self then :casting
-		elsif game.combat? and game.current_player == self then :fighting
+		elsif game.fighting? and game.current_player == self then :fighting
 		else :waiting
 		end
 	end

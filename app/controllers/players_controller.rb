@@ -95,7 +95,7 @@ class PlayersController < ApplicationController
 	# DELETE /players/1.xml
 	def destroy
 		# TODO: disallow leaving the game if you're dead.
-		# Possibly also introduce a 'retired' state for players who left the game after it started,
+		# Possibly also introduce a 'retired' state for players who left the game after it started,
 		# rather than just deleting them outright?
 		@player = Player.find(params[:id])
 		@game = @player.game

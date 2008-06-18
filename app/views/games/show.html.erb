@@ -8,8 +8,6 @@
 	var gameIsStartable = <%= @game.startable? %>;
 	var gameHasStarted = <%= !@game.open? %>;
 
-	// setGameState(<%= @game.state.to_json %>);
-	
 	<% if playing? and me.casting? %>
 		jq(function() {
 			showCastingPositions(<%= me.casting_positions.to_json %>);

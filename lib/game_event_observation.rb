@@ -83,8 +83,8 @@ module GameEventObservation
 		end
 		
 		# must happen after end_turn so that the last player doesn't immediately get de-highlighted
-		for_games_triggering(:on_start_choosing_spells) do |game|
-			game_responses << "startChoosingSpells();"
+		for_games_triggering(:on_begin_choosing_spells) do |game|
+			game_responses << "beginChoosingSpells();"
 		end
 
 		for_sprites_triggering(:after_save) do |sprite|
