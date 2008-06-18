@@ -215,7 +215,10 @@ function startGame() {
 function beginChoosingSpells() {
 	chain(function() {
 		jq('#players_list > li').addClass('awaiting_action');
-		if (myPlayerId != null) {
+		if (myPlayerId == null) {
+			setPrompt('Wizards are choosing spells');			
+		} else {
+			setPrompt('Choose your spell');
 			personalState = 'choosing_spells';
 			showConditionalFurniture();
 		}
@@ -228,6 +231,7 @@ function endChoosingSpells(id) {
 		jq('#player_'+id).removeClass('awaiting_action');
 		if (id == myPlayerId) {
 			personalState = 'waiting';
+			setPrompt('Waiting for wizards to choose spells...');
 			showConditionalFurniture();
 		}
 		return true;
@@ -243,13 +247,16 @@ function markSpellAsChosen(id, html) {
 	});
 }
 
-function beginCasting(playerId) {
+function beginCasting(playerId, playerName) {
 	chain(function() {
 		jq('#player_' + playerId).addClass('awaiting_action');
 		if (myPlayerId == playerId) {
 			personalState = 'casting';
+			setPrompt('Your turn');
 			jq.get('/games/' + gameId + '/casting_positions', null, showCastingPositions, 'json');
 			showConditionalFurniture();
+		} else {
+			setPrompt(playerName + "\'s turn");
 		}
 		return true;
 	});
@@ -290,12 +297,15 @@ function endCasting(playerId) {
 	});
 }
 
-function beginFighting(playerId) {
+function beginFighting(playerId, playerName) {
 	chain(function() {
 		jq('#player_' + playerId).addClass('awaiting_action');
 		if (myPlayerId == playerId) {
 			personalState = 'fighting';
+			setPrompt('Your turn');
 			showConditionalFurniture();
+		} else {
+			setPrompt(playerName + "\'s turn");
 		}
 		return true;
 	});
@@ -318,7 +328,6 @@ function putSprite(id, img, x, y, playerId) {
 		var sprite = jq('#sprite_'+id);
 		if (!sprite.length) {
 			sprite = jq('<img class="sprite owned_by_player_'+playerId+'" width="32" height="32" alt="" />').attr('id', 'sprite_'+id);
-			jq('#board').append(sprite);
 			if (myPlayerId == playerId) {
 				sprite.hover(function() {
 					if (personalState == 'fighting') {
@@ -344,6 +353,7 @@ function putSprite(id, img, x, y, playerId) {
 			}
 		}
 		sprite.attr('src', img).css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
+		jq('#board').append(sprite);
 		return true;
 	});
 }
@@ -403,6 +413,10 @@ function boltStep(frameNumber, sprites, frameCount, x0, y0, x1, y1) {
 }
 
 /* end of events */
+
+function setPrompt(text) {
+	jq('#prompt_message').text(text);
+}
 
 function applySpellAnchors() {
 	jq('#spells_list a.spell').click(function() {

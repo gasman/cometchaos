@@ -73,14 +73,14 @@ module GameEventObservation
 		end
 		
 		for_players_triggering(:on_begin_casting) do |player|
-			game_responses << "beginCasting(#{player.id});"
+			game_responses << "beginCasting(#{player.id}, #{player.name.to_json});"
 		end
 		for_players_triggering(:on_end_casting) do |player|
 			game_responses << "endCasting(#{player.id});"
 		end
 		
 		for_players_triggering(:on_begin_fighting) do |player|
-			game_responses << "beginFighting(#{player.id});"
+			game_responses << "beginFighting(#{player.id}, #{player.name.to_json});"
 		end
 		for_players_triggering(:on_end_fighting) do |player|
 			game_responses << "endFighting(#{player.id});"

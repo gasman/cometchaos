@@ -6,6 +6,11 @@ body {
 .panel {
 	background-color: white;
 }
+
+a { color: #000; }
+a:visited { color: #666; }
+a:hover { color: #00a; }
+
 #splash {
 	width: 400px;
 	margin: auto;
@@ -93,6 +98,38 @@ body {
 		height: 4px;
 		background-color: white;
 	}
+
+#prompt {
+	width: 508px;
+	background-color: black;
+	color: magenta;
+	font-family: Palatino, Georgia, serif;
+	font-size: 14pt;
+	padding-left: 4px;
+	line-height: 22pt;
+	height: 22pt;
+}
+#prompt ul.actions {
+	float: right;
+}
+#prompt ul.actions li {
+	display: block;
+	float: left;
+}
+#prompt ul.actions li a {
+	display: block;
+	color: #cccccc;
+	margin-top: 4pt;
+	margin-right: 4pt;
+	padding: 0 4px;
+	text-decoration: none;
+	background-color: #000044;
+	outline: 1px solid #000088;
+	line-height: 14pt;
+}
+#prompt ul.actions li a:hover {
+	background-color: #000088;
+}
 
 #sidebar {
 	margin-left: 520px;
