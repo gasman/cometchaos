@@ -1,41 +1,28 @@
 class GameObserver < ActiveRecord::Observer
+
+	observe Game, Player, Sprite, Spells::Spell
 	
-	def add_observer(obj)
-		@observers ||= []
-		@observers << obj
+	def add_observer(obj, game)
+		@observers ||= {}
+		@observers[game.id] ||= []
+		@observers[game.id] << obj
 	end
 
-	def delete_observer(obj)
-		@observers.delete obj if @observers
+	def delete_observer(obj, game)
+		@observers[game.id].delete obj if @observers and @observers[game.id]
 	end
 
-	def after_create(game)
-		(@observers || []).each do |ob|
-			ob.after_create_game(game) if ob.respond_to?(:after_create_game)
-		end
+	def respond_to?(method)
+		true
 	end
-
-	def after_update(game)
-		(@observers || []).each do |ob|
-			ob.after_update_game(game) if ob.respond_to?(:after_update_game)
-		end
-	end
-
-	def after_save(game)
-		(@observers || []).each do |ob|
-			ob.after_save_game(game) if ob.respond_to?(:after_save_game)
-		end
-	end
-	
-	def on_start(game)
-		(@observers || []).each do |ob|
-			ob.on_start_game(game) if ob.respond_to?(:on_start_game)
-		end
-	end
-	
-	def on_state_change(game)
-		(@observers || []).each do |ob|
-			ob.on_game_state_change(game) if ob.respond_to?(:on_game_state_change)
+	def method_missing(event, obj)
+		((@observers && @observers[obj.game_id]) || []).each do |observer|
+			if obj.is_a?(Spells::Spell)
+				class_name = :spell # avoid indexing them under the name of their subclass
+			else
+				class_name = obj.class.name.underscore.to_sym
+			end
+			observer.receive_event(class_name, event, obj)
 		end
 	end
 end

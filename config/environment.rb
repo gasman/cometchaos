@@ -53,7 +53,7 @@ Rails::Initializer.run do |config|
 
 	# Activate observers that should always be running
 	# config.active_record.observers = :cacher, :garbage_collector
-	config.active_record.observers = :game_observer, :player_observer, :sprite_observer
+	config.active_record.observers = :game_observer
 
 	# Make Active Record use UTC-base instead of local time
 	# config.active_record.default_timezone = :utc

@@ -4,7 +4,6 @@ class Player < ActiveRecord::Base
 	acts_as_list :scope => :game
 	
 	has_many :sprites, :dependent => :destroy
-	has_one :wizard_sprite, :class_name => 'Sprite', :conditions => "is_wizard = 't'"
 	
 	belongs_to :next_spell, :class_name => 'Spells::Spell', :foreign_key => 'next_spell_id'
 	
@@ -24,23 +23,33 @@ class Player < ActiveRecord::Base
 	validates_inclusion_of :wizard_type, :in => WIZARD_TYPES, :if => :new_record?
 	validates_inclusion_of :wizard_colour, :in => WIZARD_COLOURS, :if => :new_record?
 	
-	def after_create
-		self.wizard_sprite = Sprite.new(:image => "wizards/#{@wizard_type}_#{@wizard_colour}.png",
+	def initialize(*opts)
+		super(*opts)
+		self.wizard_sprite = Sprite.new(:player => self,
+			:image => "wizards/#{@wizard_type}_#{@wizard_colour}.png",
 			:is_wizard => true, :movement_allowance => 1)
-		game.set_wizard_start_positions
+	end
+
+	def wizard_sprite=(sprite)
+		sprites << sprite
+		@wizard_sprite = sprite
+	end
+	def wizard_sprite
+		@wizard_sprite ||= sprites.detect(&:is_wizard?)
 	end
 	
-	def after_destroy
-		game.set_wizard_start_positions
-		# the departure of a player might make it possible to move to the next game
-		# state - for example, if they were the last player left to choose a spell
-		game.continue!
+	def before_update
+		if name_changed? # TODO: check for avatar changing (once that's a field of player)
+			callback :on_change_appearance
+		end
+
+		if is_operator_changed?
+			callback(is_operator? ? :on_assign_operator : :on_revoke_operator)
+		end
 	end
 	
 	def awaiting_action?
-		(game.choosing_spells? and !has_chosen_spell?) or
-		(game.casting? and game.current_player == self) or
-		(game.combat? and game.current_player == self)
+		state == :choosing_spells || state == :casting || state == :fighting
 	end
 	
 	def choose_spell!(spell)
@@ -48,32 +57,61 @@ class Player < ActiveRecord::Base
 		raise Game::InvalidMove.new, "You cannot choose a spell at this time" unless game.choosing_spells?
 		raise Game::InvalidMove.new, "That spell isn't yours!" unless spell.player == self
 		self.next_spell = spell
-		self.has_chosen_spell = true
-		save!
+		end_turn
 		callback :after_choose_spell
 	end
 	
 	# not intended to be called directly; game will call this when it's this player's turn,
 	# to trigger callbacks
-	def begin_turn
-		callback :on_begin_turn
+	def begin_casting
+		callback :on_begin_casting
+	end
+	def begin_fighting
+		callback :on_begin_fighting
 	end
 	
+	# this IS intended to be called directly to end the user's turn -
+	# either by user's explicit action to end turn, or after user's action has caused
+	# the turn to end (e.g. having chosen / cast a spell).
 	def end_turn
-		game.next_player!
-		callback :on_end_turn
+		case state
+			when :choosing_spells
+				self.has_chosen_spell = true
+				save!
+				game.continue!
+				callback :on_end_choosing_spells
+			when :casting
+				game.next_player!
+				callback :on_end_casting
+			when :fighting
+				game.next_player!
+				callback :on_end_fighting
+			else
+				raise Game::InvalidMove.new, "It isn't currently your turn"
+		end
 	end
 	
-	def is_casting?
-		game and game.casting? and game.current_player == self
+	STATES = [:nonplayer, :waiting, :choosing_spells, :casting, :fighting]
+	def state
+		if !game then :nonplayer
+		# elsif self.dead? then :waiting # TODO: add this when we have a 'dead' status
+		elsif game.choosing_spells? and !self.has_chosen_spell then :choosing_spells
+		elsif game.casting? and game.current_player == self then :casting
+		elsif game.combat? and game.current_player == self then :fighting
+		else :waiting
+		end
 	end
-	def is_fighting?
-		game and game.combat? and game.current_player == self
+	
+	# define state-testing methods: casting? etc
+	STATES.each do |state_to_test|
+		define_method "#{state_to_test}?" do
+			self.state == state_to_test
+		end
 	end
 	
 	# coordinates where this player can cast his next spell
 	def casting_positions
-		raise Game::InvalidMove.new, "You cannot cast a spell at this time" unless is_casting?
+		raise Game::InvalidMove.new, "You cannot cast a spell at this time" unless casting?
 		
 		occupied_squares = game.sprites.collect{|sprite| [sprite.x, sprite.y]}
 		available_squares = []
@@ -87,9 +125,11 @@ class Player < ActiveRecord::Base
 	def cast!(x, y)
 		x = x.to_i
 		y = y.to_i
-		raise Game::InvalidMove.new, "You cannot cast a spell at this time" unless is_casting?
+		raise Game::InvalidMove.new, "You cannot cast a spell at this time" unless casting?
 		raise Game::InvalidMove.new, "Out of range" unless casting_positions.include?([x,y])
 		next_spell.cast!(x,y)
+		# TODO: don't discard spell / end turn if there are still shots remaining
+		next_spell.destroy
 		self.next_spell = nil
 		save!
 		end_turn

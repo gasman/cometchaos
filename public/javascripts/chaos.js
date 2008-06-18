@@ -14,36 +14,27 @@ function makeMyNameEditable() {
 /* jq(makeMyNameEditable); */
 
 var useTransitions = false;
-var myPlayerId = null;
-var currentPlayerId = null;
-var myOperatorStatus = false;
 var gameState;
 var selectedSpriteForMovement = null;
-function becomePlayer(id, isOperator) {
-	myPlayerId = id;
-	myOperatorStatus = isOperator;
-	showConditionalFurniture();
-}
 
 function showConditionalFurniture() {
 	jq('.conditional').each(function() {
 		var elem = jq(this);
 		var show = true;
 
-		var isMyTurn = (myPlayerId != null && myPlayerId == currentPlayerId);
-		if (gameState != 'casting' && gameState != 'combat') isMyTurn = false;
+		var isMyTurn = (personalState == 'choosing_spells' || personalState == 'casting' || personalState == 'fighting');
 
-		if (elem.hasClass('when_game_started') && gameState == 'open') show = false;
-		if (elem.hasClass('when_game_not_started') && gameState != 'open') show = false;
-		if (elem.hasClass('when_choosing_spells') && gameState != 'choosing_spells') show = false;
+		if (elem.hasClass('when_game_is_startable') && !gameIsStartable) show = false;
+		if (elem.hasClass('when_game_is_joinable') && !gameIsJoinable) show = false;
+		if (elem.hasClass('when_game_started') && !gameHasStarted) show = false;
+		if (elem.hasClass('when_game_not_started') && gameHasStarted) show = false;
+		if (elem.hasClass('when_choosing_spells') && personalState != 'choosing_spells') show = false;
 		if (elem.hasClass('when_my_turn') && !isMyTurn) show = false;
-		if (elem.hasClass('when_has_chosen_spell') && !hasChosenSpell) show = false;
-		if (elem.hasClass('when_has_not_chosen_spell') && hasChosenSpell) show = false;
 		if (elem.hasClass('when_has_pending_spell') && !hasPendingSpell) show = false;
 		if (elem.hasClass('when_has_no_pending_spell') && hasPendingSpell) show = false;
-		if (elem.hasClass('for_nonplayer') && myPlayerId != null) show = false;
-		if (elem.hasClass('for_player') && myPlayerId == null) show = false;
-		if (elem.hasClass('for_operator') && myOperatorStatus == false) show = false;
+		if (elem.hasClass('for_nonplayer') && personalState != 'nonplayer') show = false;
+		if (elem.hasClass('for_player') && personalState == 'nonplayer') show = false;
+		if (elem.hasClass('for_operator') && !isOperator) show = false;
 		if (show) {
 			if (useTransitions && elem.hasClass('panel')) {
 				elem.slideDown();
@@ -92,6 +83,15 @@ function findHttpMethodClass(elem) {
 	return httpMethod;
 }
 
+/* Event actions */
+
+function becomePlayer(id) {
+	myPlayerId = id;
+	jq('#player_'+id).addClass('me');
+	personalState = 'waiting';
+	showConditionalFurniture();
+}
+
 function putPlayer(id, html) {
 	var newPlayer = applyAvatarRollover(applyFormRemoting(jq(html)));
 	if (id == myPlayerId) {
@@ -106,9 +106,6 @@ function putPlayer(id, html) {
 		newPlayer.hide();
 		jq('#players_list').append(newPlayer);
 		newPlayer.slideDown();
-		if (id == myPlayerId) {
-			showConditionalFurniture();
-		}
 	}
 }
 
@@ -116,9 +113,20 @@ function removePlayer(id) {
 	jq('#player_'+id).slideUp('normal', function() {jq(this).remove()});
 	if (id == myPlayerId) {
 		myPlayerId = null;
-		myOperatorStatus = false;
+		isOperator = false;
+		personalState = 'nonplayer';
 		showConditionalFurniture();
 	}
+}
+
+function setGameStartable(state) {
+	gameIsStartable = state;
+	showConditionalFurniture();
+}
+
+function setGameJoinable(state) {
+	gameIsJoinable = state;
+	showConditionalFurniture();
 }
 
 function announceGame(id, html) {
@@ -132,20 +140,122 @@ function announceGame(id, html) {
 	}
 }
 
+function assignOperator(id) {
+	jq('#player_'+id).addClass('operator');
+	if (id == myPlayerId) {
+		isOperator = true;
+		showConditionalFurniture();
+	}
+}
+
+function revokeOperator(id) {
+	jq('#player_'+id).removeClass('operator');
+	if (id == myPlayerId) {
+		isOperator = false;
+		showConditionalFurniture();
+	}
+}
+
+function startGame() {
+	gameHasStarted = true;
+	gameIsStartable = false;
+	gameIsJoinable = false;
+	/* fetch spells */
+	jq('#spells_list').load('/games/' + gameId + '/spells', null, applySpellAnchors);
+	showConditionalFurniture();
+}
+
+function startChoosingSpells() {
+	jq('#players_list > li').addClass('awaiting_action');
+	if (myPlayerId != null) {
+		personalState = 'choosing_spells';
+		showConditionalFurniture();
+	}
+}
+
+function endChoosingSpells(id) {
+	jq('#player_'+id).removeClass('awaiting_action');
+	if (id == myPlayerId) {
+		personalState = 'waiting';
+		showConditionalFurniture();
+	}
+}
+
+function markSpellAsChosen(id, html) {
+	jq('#next_spell').html(html);
+	hasPendingSpell = true;
+	showConditionalFurniture();
+}
+
+function beginCasting(playerId) {
+	jq('#player_' + playerId).addClass('awaiting_action');
+	if (myPlayerId == playerId) {
+		personalState = 'casting';
+		jq.get('/games/' + gameId + '/casting_positions', null, showCastingPositions, 'json');
+		showConditionalFurniture();
+	}
+}
+function showCastingPositions(positions) {
+	for (var i = 0; i < positions.length; i++) {
+		insertCastingPosition(positions[i][0], positions[i][1]);
+	}
+}
+function insertCastingPosition(x,y) {
+	var square = jq('<div class="casting_position"></div>')
+	square.css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
+	square.click(function() {
+		jq.post('/games/' + gameId + '/cast_spell', {'x': x, 'y': y}, function() {}, 'script');
+		jq('#board .casting_position').remove();
+	});
+	jq('#board').append(square);
+}
+
+function discardSpell(id) {
+	jq('#spell_'+id).slideUp();
+	hasPendingSpell = false;
+	showConditionalFurniture();
+}
+
+function endCasting(playerId) {
+	jq('#player_' + playerId).removeClass('awaiting_action');
+	if (myPlayerId == playerId) {
+		jq('#board .casting_position').remove();
+		personalState = 'waiting';
+		showConditionalFurniture();
+	}
+}
+
+function beginFighting(playerId) {
+	jq('#player_' + playerId).addClass('awaiting_action');
+	if (myPlayerId == playerId) {
+		personalState = 'fighting';
+		showConditionalFurniture();
+	}
+}
+
+function endFighting(playerId) {
+	jq('#player_' + playerId).removeClass('awaiting_action');
+	if (myPlayerId == playerId) {
+		jq('#board .move_position').remove();
+		personalState = 'waiting';
+		showConditionalFurniture();
+	}
+}
+
 function putSprite(id, img, x, y, playerId) {
 	var sprite = jq('#sprite_'+id);
 	if (!sprite.length) {
 		sprite = jq('<img class="sprite owned_by_player_'+playerId+'" width="32" height="32" alt="" />').attr('id', 'sprite_'+id);
 		jq('#board').append(sprite);
 		sprite.hover(function() {
-			if (playerId == myPlayerId && currentPlayerId == myPlayerId && gameState == 'combat') {
+			if (personalState == 'fighting') {
 				jq(this).addClass('highlight');
 			}
 		}, function() {
 			jq(this).removeClass('highlight');
 		});
 		sprite.click(function() {
-			if (playerId == myPlayerId && currentPlayerId == myPlayerId && gameState == 'combat') {
+			if (personalState == 'fighting') {
 				if (selectedSpriteForMovement == null) {
 					/* clicked on sprite to start movement */
 					selectedSpriteForMovement = id;
@@ -168,13 +278,6 @@ function removeSprite(id) {
 function logEvent(html) {
 	var li = jq('<li></li>').append(html);
 	jq('#events_list').append(li);
-}
-
-function assignOperator(id, status) {
-	if (id == myPlayerId) {
-		myOperatorStatus = status;
-		showConditionalFurniture();
-	}
 }
 
 function setGameState(state) {
@@ -201,11 +304,6 @@ function showGameState() {
 	}
 }
 
-function startGame() {
-	/* fetch spells */
-	jq('#spells_list').load('/games/' + gameId + '/spells', null, applySpellAnchors);
-}
-
 function applySpellAnchors() {
 	jq('#spells_list a.spell').click(function() {
 		var newSpellInfo = jq(jq(this).attr('href')).clone();
@@ -216,36 +314,6 @@ function applySpellAnchors() {
 		jq(this).addClass('current')
 		return false;
 	});
-}
-
-function markSpellAsChosen(id, html) {
-	jq('#spell_' + id).slideUp();
-	jq('#next_spell').html(html);
-	hasPendingSpell = true;
-	hasChosenSpell = true;
-	showConditionalFurniture();
-}
-
-function beginCasting(playerId) {
-	currentPlayerId = playerId;
-	if (myPlayerId == playerId) {
-		jq.get('/games/' + gameId + '/casting_positions', null, showCastingPositions, 'json');
-	}
-	showConditionalFurniture();
-}
-function showCastingPositions(positions) {
-	for (var i = 0; i < positions.length; i++) {
-		insertCastingPosition(positions[i][0], positions[i][1]);
-	}
-}
-function insertCastingPosition(x,y) {
-	var square = jq('<div class="casting_position"></div>')
-	square.css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
-	square.click(function() {
-		jq.post('/games/' + gameId + '/cast_spell', {'x': x, 'y': y}, function() {}, 'script');
-		jq('#board .casting_position').remove();
-	});
-	jq('#board').append(square);
 }
 
 function showMovePositions(spriteId, positions) {
@@ -278,11 +346,6 @@ function applyAvatarRollover(player) {
 		jq('#board .sprite.owned_by_'+playerId).removeClass('highlight');
 	});
 	return player;
-}
-
-function beginCombat(playerId) {
-	currentPlayerId = playerId;
-	showConditionalFurniture();
 }
 
 jq(function() {

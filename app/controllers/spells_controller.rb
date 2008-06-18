@@ -18,9 +18,8 @@ class SpellsController < ApplicationController
 		unless playing? and @player == me
 			raise "Attempted to select a spell that isn't yours"
 		end
-		observing_game_events do
+		observing_game_events(@game) do
 			@player.choose_spell!(@spell)
-			@game.continue!
 		end
 		
 		if request.xhr?

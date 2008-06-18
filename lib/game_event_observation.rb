@@ -4,98 +4,130 @@
 module GameEventObservation
 	# Execute a block with game event observers in place, then issue Comet messages
 	# to reflect what it saw
-	def observing_game_events
-		# TODO: set up observers to only watch events from a single game
-		GameObserver.instance.add_observer(self)
-		PlayerObserver.instance.add_observer(self)
-		SpriteObserver.instance.add_observer(self)
+	def observing_game_events(game)
+		@eventful_objects = {}
+		GameObserver.instance.add_observer(self, game)
 		yield
-		GameObserver.instance.delete_observer(self)
-		PlayerObserver.instance.delete_observer(self)
-		SpriteObserver.instance.delete_observer(self)
-		(@players_to_put || {}).values.each do |player|
-			next if @players_to_destroy and @players_to_destroy.has_key?(player.id)
+		GameObserver.instance.delete_observer(self, game)
+		
+		global_responses = ''
+		game_responses = ''
+
+		for_players_triggering(:after_create) do |player|
 			player_html = render_to_string :partial => 'games/player', :object => player
-			player.game.broadcast "putPlayer(#{player.id}, #{player_html.to_json})"
-		end
-		(@players_to_destroy || {}).values.each do |player|
-			player.game.broadcast "removePlayer(#{player.id})"
-		end
-		(@players_to_begin_turn || {}).values.each do |player|
-			if player.game.casting?
-				player.game.broadcast "beginCasting(#{player.id})"
-			elsif player.game.combat?
-				player.game.broadcast "beginCombat(#{player.id})"
+			game_responses << "putPlayer(#{player.id}, #{player_html.to_json});"
+			
+			if game.is_public?
+				# update number of players in announcement
+				game_html = render_to_string :partial => 'games/announcement', :object => game
+				global_responses << "announceGame(#{game.id}, #{game_html.to_json});"
 			end
 		end
-		(@games_to_announce || {}).values.each do |game|
-			game_html = render_to_string :partial => 'games/announcement', :object => game
-			Meteor.shoot 'games', "announceGame(#{game.id}, #{game_html.to_json})"
+
+		for_players_triggering(:on_change_appearance) do |player|
+			player_html = render_to_string :partial => 'games/player', :object => player
+			game_responses << "putPlayer(#{player.id}, #{player_html.to_json});"
 		end
-		(@games_to_start || {}).values.each do |game|
-			game.broadcast "startGame()"
+
+		for_players_triggering(:on_assign_operator) do |player|
+			game_responses << "assignOperator(#{player.id});"
 		end
-		(@games_to_continue || {}).values.each do |game|
-			game.broadcast "setGameState(#{game.state.to_json})"
+		for_players_triggering(:on_revoke_operator) do |player|
+			game_responses << "revokeOperator(#{player.id});"
 		end
-		(@sprites_to_put || {}).values.each do |sprite|
-			next if @sprites_to_destroy and @sprites_to_destroy.has_key?(sprite.id)
+		
+		for_players_triggering(:after_destroy) do |player|
+			game_responses << "removePlayer(#{player.id});"
+
+			if game.is_public?
+				# update number of players in announcement
+				game_html = render_to_string :partial => 'games/announcement', :object => game
+				global_responses << "announceGame(#{game.id}, #{game_html.to_json});"
+			end
+		end
+		
+		for_games_triggering(:become_startable) do |game|
+			game_responses << "setGameStartable(true);"
+		end
+		for_games_triggering(:become_unstartable) do |game|
+			game_responses << "setGameStartable(false);"
+		end
+		for_games_triggering(:become_joinable) do |game|
+			game_responses << "setGameJoinable(true);"
+		end
+		for_games_triggering(:become_unjoinable) do |game|
+			game_responses << "setGameJoinable(false);"
+		end
+		for_games_triggering(:on_start) do |game|
+			game_responses << "startGame();"
+		end
+		
+		for_players_triggering(:on_end_choosing_spells) do |player|
+			game_responses << "endChoosingSpells(#{player.id});"
+		end
+		
+		for_players_triggering(:on_begin_casting) do |player|
+			game_responses << "beginCasting(#{player.id});"
+		end
+		for_players_triggering(:on_end_casting) do |player|
+			game_responses << "endCasting(#{player.id});"
+		end
+		
+		# TODO: 'cast spell' event
+
+		for_players_triggering(:on_begin_fighting) do |player|
+			game_responses << "beginFighting(#{player.id});"
+		end
+		for_players_triggering(:on_end_fighting) do |player|
+			game_responses << "endFighting(#{player.id});"
+		end
+		
+		# must happen after end_turn so that the last player doesn't immediately get de-highlighted
+		for_games_triggering(:on_start_choosing_spells) do |game|
+			game_responses << "startChoosingSpells();"
+		end
+
+		for_sprites_triggering(:after_save) do |sprite|
 			sprite_js = render_to_string(:partial => 'games/sprite', :object => sprite)
-			sprite.game.broadcast sprite_js
+			game_responses << sprite_js
 		end
-		(@sprites_to_destroy || {}).values.each do |sprite|
-			sprite.game.broadcast "removeSprite(#{sprite.id})"
+		for_sprites_triggering(:after_destroy) do |sprite|
+			game_responses << "removeSprite(#{sprite.id});"
+		end
+		
+		game.broadcast game_responses unless game_responses.blank?
+		Meteor.shoot 'games', global_responses unless global_responses.blank?
+	end
+	
+	def receive_event(class_name, event, obj)
+		@eventful_objects ||= {}
+		@eventful_objects[class_name] ||= {}
+		@eventful_objects[class_name][event] ||= []
+		@eventful_objects[class_name][event] << obj unless @eventful_objects[class_name][event].include?(obj)
+	end
+	
+	def for_games_triggering(event)
+		if @eventful_objects[:game] and @eventful_objects[:game][event]
+			@eventful_objects[:game][event].each{|game| yield game}
+		end
+	end
+
+	def for_players_triggering(event)
+		if @eventful_objects[:player] and @eventful_objects[:player][event]
+			@eventful_objects[:player][event].each{|player| yield player}
+		end
+	end
+
+	def for_sprites_triggering(event)
+		if @eventful_objects[:sprite] and @eventful_objects[:sprite][event]
+			@eventful_objects[:sprite][event].each{|sprite| yield sprite}
+		end
+	end
+
+	def for_spells_triggering(event)
+		if @eventful_objects[:spell] and @eventful_objects[:spell][event]
+			@eventful_objects[:spell][event].each{|spell| yield spell}
 		end
 	end
 	
-	def on_start_game(game)
-		@games_to_start ||= {}
-		@games_to_start[game.id] = game
-		@games_to_announce ||= {}
-		@games_to_announce[game.id] = game if game.is_public?
-	end
-
-	def on_game_state_change(game)
-		@games_to_continue ||= {}
-		@games_to_continue[game.id] = game
-	end
-
-	def after_create_player(player)
-		@players_to_put ||= {}
-		@players_to_put[player.id] = player
-		@games_to_announce ||= {}
-		@games_to_announce[player.game.id] = player.game if player.game.is_public?
-	end
-	def after_save_player(player) # TODO: only announce 'important' changes
-		@players_to_put ||= {}
-		@players_to_put[player.id] = player
-	end
-	def after_player_chooses_spell(player)
-		@players_to_put ||= {}
-		@players_to_put[player.id] = player
-	end
-	def on_player_begin_turn(player)
-		@players_to_put ||= {}
-		@players_to_put[player.id] = player
-		@players_to_begin_turn ||= {}
-		@players_to_begin_turn[player.id] = player
-	end
-	def on_player_end_turn(player)
-		@players_to_put ||= {}
-		@players_to_put[player.id] = player
-	end
-	def after_destroy_player(player)
-		@players_to_destroy ||= {}
-		@players_to_destroy[player.id] = player
-		@games_to_announce ||= {}
-		@games_to_announce[player.game.id] = player.game if player.game.is_public?
-	end
-	def after_save_sprite(sprite) # TODO: only announce 'important' changes
-		@sprites_to_put ||= {}
-		@sprites_to_put[sprite.id] = sprite
-	end
-	def after_destroy_sprite(sprite)
-		@sprites_to_destroy ||= {}
-		@sprites_to_destroy[sprite.id] = sprite
-	end
 end

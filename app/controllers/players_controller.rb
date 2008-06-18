@@ -46,18 +46,18 @@ class PlayersController < ApplicationController
 	def create
 		@game = Game.find(params[:game_id])
 		@player = Player.new(params[:player])
-		@player.game = @game
+		@player.game = @game # required for @player to pass validation
 		
-		if @player.valid?
-			observing_game_events do
-				@game.players << @player
+		if @player.valid? and @game.joinable?
+			observing_game_events(@game) do
+				@game.add_player(@player)
 			end
 			announce_event("%s has joined the game", @player.name)
 
 			become_player(@player)
 			
 			if request.xhr?
-				render :text => "becomePlayer(#{@player.id}, #{@player.is_operator?})"
+				render :text => "becomePlayer(#{@player.id})"
 				return
 			end
 
@@ -66,6 +66,7 @@ class PlayersController < ApplicationController
 				format.xml  { render :xml => @player, :status => :created, :location => @player }
 			end
 		else
+			flash[:errors] = 'This game is not available for joining' if !@game.joinable?
 			respond_to do |format|
 				format.html { render :action => "new" }
 				format.xml  { render :xml => @player.errors, :status => :unprocessable_entity }
@@ -93,13 +94,16 @@ class PlayersController < ApplicationController
 	# DELETE /players/1
 	# DELETE /players/1.xml
 	def destroy
+		# TODO: disallow leaving the game if you're dead.
+		# Possibly also introduce a 'retired' state for players who left the game after it started,
+		# rather than just deleting them outright?
 		@player = Player.find(params[:id])
 		@game = @player.game
 		unless playing? and (@player == me or me.is_operator?)
 			raise "You can't kick a player because you're not an operator!"
 		end
-		observing_game_events do
-			@player.destroy
+		observing_game_events(@game) do
+			@game.remove_player(@player)
 		end
 		if @player == me
 			announce_event("%s has left the game", @player.name)
@@ -121,12 +125,11 @@ class PlayersController < ApplicationController
 		unless playing? and me.is_operator?
 			raise "Only operators can op people"
 		end
-		observing_game_events do
+		observing_game_events(@game) do
 			@player.is_operator = true
 			@player.save!
 		end
 
-		@game.broadcast "assignOperator(#{@player.id}, true)"
 		announce_event("%s was promoted to operator by %s", @player.name, me.name)
 
 		render :nothing => true and return if request.xhr?
@@ -143,12 +146,11 @@ class PlayersController < ApplicationController
 		unless playing? and me.is_operator?
 			raise "Only operators can deop people"
 		end
-		observing_game_events do
+		observing_game_events(@game) do
 			@player.is_operator = false
 			@player.save!
 		end
 
-		@game.broadcast "assignOperator(#{@player.id}, false)"
 		announce_event("%s was demoted by %s", @player.name, me.name)
 
 		render :nothing => true and return if request.xhr?

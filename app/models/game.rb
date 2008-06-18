@@ -4,6 +4,7 @@ class Game < ActiveRecord::Base
 
 	acts_as_state_machine :initial => :open
 	
+	MAX_PLAYERS = 8
 	WIZARD_START_POSITIONS = [
 		[],
 		[[1,4]],
@@ -40,6 +41,11 @@ class Game < ActiveRecord::Base
 		transitions :from => :combat, :to => :choosing_spells, :guard => lambda {|game| game.current_player == game.players.last }
 	end
 	
+	# to facilitate observing all objects relating to a specific game
+	def game_id
+		self.id
+	end
+	
 	# Comet communication
 	def channel
 		"game_#{self.id}"
@@ -53,11 +59,37 @@ class Game < ActiveRecord::Base
 		find(:all, :conditions => "games.is_public = 't' AND players.id IS NOT NULL", :include => :operators)
 	end
 	
-	def set_wizard_start_positions
-		return unless self.open?
-		starts = WIZARD_START_POSITIONS[self.players.size]
-		self.players.each_with_index do |player, i|
-			player.wizard_sprite.update_attributes(:x => starts[i][0], :y => starts[i][1])
+	def joinable?
+		self.open? and players.size < MAX_PLAYERS
+	end
+
+	def startable?
+		self.open? and players.size > 1
+	end
+	
+	def add_player(player)
+		# we can't simply run set_wizard_start_positions on the players collection after
+		# appending the new player, because that will return a new instance of player,
+		# and consequently a new instance of sprite, and therefore the old instance of
+		# sprite will be sitting around in the observer's queue with no coordinates.
+		# Activerecord == fail.
+		set_wizard_start_positions(players + [player])
+		players << player
+		callback :become_unjoinable if players.size == MAX_PLAYERS
+		callback :become_startable if players.size == 2
+	end
+
+	def remove_player(player)
+		players.delete(player)
+		player.destroy
+		if open?
+			set_wizard_start_positions(players)
+			callback :become_joinable if players.size == MAX_PLAYERS - 1
+			callback :become_unstartable if players.size == 1
+		else
+			# the departure of a player might make it possible to move to the next game
+			# state - for example, if they were the last player left to choose a spell
+			game.continue!
 		end
 	end
 	
@@ -68,7 +100,7 @@ class Game < ActiveRecord::Base
 			if next_player
 				self.current_player = next_player
 				save!
-				self.current_player.begin_turn
+				self.current_player.begin_casting
 			else
 				# all players have cast spells
 				self.continue!
@@ -79,7 +111,7 @@ class Game < ActiveRecord::Base
 			if next_player
 				self.current_player = next_player
 				save!
-				self.current_player.begin_turn
+				self.current_player.begin_fighting
 			else
 				# all players have completed combat
 				self.continue!
@@ -90,6 +122,14 @@ class Game < ActiveRecord::Base
 	end
 	
 	private
+	
+	def set_wizard_start_positions(players)
+		starts = WIZARD_START_POSITIONS[players.size]
+		players.each_with_index do |player, i|
+			player.wizard_sprite.attributes = {:x => starts[i][0], :y => starts[i][1]}
+			player.wizard_sprite.save! unless player.wizard_sprite.new_record?
+		end
+	end
 	
 	def game_start_actions
 		distribute_spells
@@ -117,14 +157,14 @@ class Game < ActiveRecord::Base
 			player.update_attribute(:has_chosen_spell, false)
 			player.update_attribute(:next_spell_id, nil)
 		end
-		change_state_actions
+		callback :on_start_choosing_spells
 	end
 	
 	def start_casting
 		if players_with_spells_to_cast.any?
 			self.current_player = players_with_spells_to_cast.first
-			self.current_player.begin_turn
 			save!
+			self.current_player.begin_casting
 		else
 			continue!
 		end
@@ -138,11 +178,12 @@ class Game < ActiveRecord::Base
 			sprite.update_attribute(:remaining_moves, sprite.movement_allowance)
 		end
 		self.current_player = players.first
-		self.current_player.begin_turn
 		save!
+		self.current_player.begin_fighting
 		change_state_actions
 	end
 	
+	# TODO: deprecate
 	def change_state_actions
 		callback :on_state_change
 	end

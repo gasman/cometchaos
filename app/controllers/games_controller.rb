@@ -49,12 +49,12 @@ class GamesController < ApplicationController
 		@game = Game.new(params[:game])
 		@player = Player.new(params[:player])
 		@player.is_operator = true
-		@player.game = @game
-		@game.players << @player
+		@player.game = @game # required to make @player valid
 
 		if @player.valid? and @game.valid?
-			observing_game_events do
-				@game.save!
+			observing_game_events(@game) do
+				@game.add_player(@player)
+				@game.save! # also saves player and player sprite
 			end
 
 			become_player(@player)
@@ -106,7 +106,8 @@ class GamesController < ApplicationController
 		unless playing? and me.is_operator?
 			raise "Only operators can start the game"
 		end
-		observing_game_events do
+		raise "The game cannot be started at this time" unless @game.startable?
+		observing_game_events(@game) do
 			@game.start!
 		end
 		announce_event("The game has started. Let battle commence!")
@@ -129,17 +130,30 @@ class GamesController < ApplicationController
 	def cast_spell
 		@game = Game.find(params[:id])
 		raise "You aren't a player in this game" unless playing?
-		observing_game_events do
+		@spell = me.next_spell
+		observing_game_events(@game) do
 			me.cast!(params[:x], params[:y])
 		end
-		announce_event("%s casts %s", me.name, me.next_spell.name)
+		# TODO: do something about repetition 
+		announce_event("%s casts %s", me.name, @spell.name)
+		
+		if request.xhr?
+			output = ''
+			for_spells_triggering(:after_destroy) do |spell|
+				output << "discardSpell(#{spell.id});"
+			end
+			render :text => output
+		else
+			format.html { redirect_to(@game) }
+			format.xml  { head :ok }
+		end
 	end
 	
 	# POST /games/1/end_turn
 	def end_turn
 		@game = Game.find(params[:id])
 		raise "You aren't a player in this game" unless playing?
-		observing_game_events do
+		observing_game_events(@game) do
 			me.end_turn
 		end
 	end

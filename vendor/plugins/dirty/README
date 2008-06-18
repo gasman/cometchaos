@@ -1,0 +1,31 @@
+Dirty
+=====
+
+A newly instantiated object is unchanged:
+  person = Person.find_by_name('uncle bob')
+  person.changed?       # => false
+
+Change the name:
+  person.name = 'Bob'
+  person.changed?       # => true
+  person.name_changed?  # => true
+  person.name_was       # => 'uncle bob'
+  person.name_change    # => ['uncle bob', 'Bob']
+  person.name = 'Bill'
+  person.name_change    # => ['uncle bob', 'Bill']
+
+Save the changes:
+  person.save
+  person.changed?       # => false
+  person.name_changed?  # => false
+
+Assigning the same value leaves the attribute unchanged:
+  person.name = 'Bill'
+  person.name_changed?  # => false
+  person.name_change    # => nil
+
+Which attributes have changed?
+  person.name = 'bob'
+  person.changed        # => ['name']
+  person.changes        # => { 'name' => ['Bill', 'bob'] }
+

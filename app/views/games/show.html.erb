@@ -1,18 +1,19 @@
 <% javascript_tag do %>
 	var gameId = <%= @game.id %>;
-	setGameState(<%= @game.state.to_json %>);
-	<% if playing? %>
-		becomePlayer(<%= me.id %>, <%= me.is_operator? %>);
-		<% if me.is_casting? %>
-			jq(function() {
-				showCastingPositions(<%= me.casting_positions.to_json %>);
-			});
-		<% end %>
-	<% end %>
+	var myPlayerId = <%= playing? ? me.id : 'null' %>;
+	var isOperator = <%= !!(playing? and me.is_operator?) %>;
+	var personalState = <%= (playing? ? me.state : 'nonplayer').to_json %>;
 	var hasPendingSpell = <%= !!(playing? and me.next_spell) %>;
-	var hasChosenSpell = <%= !!(playing? and me.has_chosen_spell?) %>;
-	<% if @game.combat? and @game.current_player %>
-		currentPlayerId = <%= @game.current_player.id %>;
+	var gameIsJoinable = <%= @game.joinable? %>;
+	var gameIsStartable = <%= @game.startable? %>;
+	var gameHasStarted = <%= !@game.open? %>;
+
+	// setGameState(<%= @game.state.to_json %>);
+	
+	<% if playing? and me.casting? %>
+		jq(function() {
+			showCastingPositions(<%= me.casting_positions.to_json %>);
+		});
 	<% end %>
 <% end %>
 
@@ -45,7 +46,7 @@
 				:locals => {:highlight_me => true} %>
 		</ul>
 	
-		<div class="conditional panel for_nonplayer when_game_not_started">
+		<div class="conditional panel for_nonplayer when_game_is_joinable">
 			<h2>Join this game</h2>
 			<div class="join_game_form">
 				<% form_for [@game, @new_player], :html => {:class => 'remote post'} do |f| %>
@@ -54,10 +55,10 @@
 				<% end %>
 			</div>
 		</div>
-		<div class="conditional panel for_operator when_game_not_started">
+		<div class="conditional panel for_operator when_game_is_startable">
 			<%= link_to 'Start game', start_game_path, :class => 'remote post' %>
 		</div>
-		<div class="conditional panel for_player when_my_turn">
+		<div class="conditional panel when_my_turn">
 			<%= link_to 'End turn', end_turn_game_path, :class => 'remote post' %>
 		</div>
 	</div>

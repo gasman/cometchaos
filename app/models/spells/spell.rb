@@ -4,6 +4,7 @@ module Spells
 		belongs_to :spell_variety
 
 		delegate :name, :lawfulness, :casting_chance, :casting_range, :to => :spell_variety
+		delegate :game_id, :to => :player
 	
 		def cast!(x,y)
 			player.sprites << Sprite.new(:image => spell_variety.image,

@@ -5,6 +5,10 @@ class Sprite < ActiveRecord::Base
 		@game ||= player.game
 	end
 	
+	def game_id
+		game.id
+	end
+	
 	def before_destroy
 		# make sure we have a reference to @game cached before the association is lost
 		game

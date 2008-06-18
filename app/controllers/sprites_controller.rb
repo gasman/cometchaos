@@ -18,7 +18,7 @@ class SpritesController < ApplicationController
 		@game = @player.game
 		raise "That isn't your sprite" unless playing? and @player == me
 		raise "You cannot move creatures at this time" unless @game.combat?
-		observing_game_events do
+		observing_game_events(@game) do
 			@sprite.move!(params[:x], params[:y])
 		end
 		render :json => @sprite.move_positions

@@ -27,7 +27,7 @@
 					<li>Range: <%= spell.casting_range %></li>
 				<% end %>
 			</ul>
-			<%= link_to "Select this spell", select_spell_path(spell), :class => 'remote post conditional when_choosing_spells when_has_not_chosen_spell' %>
+			<%= link_to "Select this spell", select_spell_path(spell), :class => 'remote post conditional when_choosing_spells' %>
 		</div>
 	</li>
 <% end %>
