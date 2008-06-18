@@ -372,6 +372,13 @@ function logEvent(html) {
 	});
 }
 
+function followUpEvent(html) {
+	chain(function() {
+		jq('#events_list li:last').append(html);
+		return true;
+	});
+}
+
 BOLT_SIZE = 20;
 BOLT_SPEED = 9; /* frames per unit distance */
 

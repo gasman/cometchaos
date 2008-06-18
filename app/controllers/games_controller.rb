@@ -134,8 +134,6 @@ class GamesController < ApplicationController
 		observing_game_events(@game) do
 			me.cast!(params[:x], params[:y])
 		end
-		# TODO: do something about repetition 
-		announce_event("%s casts %s", me.name, @spell.name)
 		
 		if request.xhr?
 			output = ''

@@ -15,8 +15,17 @@ module GameEventObservation
 		
 		# do this first so that after-effects of the spell happen after it
 		for_spells_triggering(:on_cast) do |spell|
+			# TODO: do something about repetition (only show 'bob casts X' on the first shot of a multi-shot spell)
+			event_html = render_to_string(:partial => 'games/event', :object => ["%s casts %s... ", spell.player.name, spell.name])
+			game_responses << "logEvent(#{event_html.to_json});"
+
 			wizard = spell.player.wizard_sprite
 			game_responses << "fireBolt(#{wizard.x}, #{wizard.y}, #{spell.target_x}, #{spell.target_y});"
+			if spell.succeeded
+				game_responses << "followUpEvent('Spell succeeds');"
+			else
+				game_responses << "followUpEvent('Spell fails');"
+			end
 		end
 
 		for_players_triggering(:after_create) do |player|
