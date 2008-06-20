@@ -2,12 +2,14 @@ module Spells
 	class Spell < ActiveRecord::Base
 		belongs_to :player
 		belongs_to :spell_variety
-
+		
+		attr_accessible # all attributes are protected by default
+		
 		delegate :name, :lawfulness, :casting_chance, :casting_range, :to => :spell_variety
 		delegate :game_id, :to => :player
 	
 		attr_reader :target_x, :target_y, :succeeded
-	
+		
 		def cast!(x,y)
 			@target_x, @target_y = x, y
 			callback :on_cast
@@ -25,6 +27,10 @@ module Spells
 			else
 				""
 			end
+		end
+		
+		def needs_illusion_flag?
+			false
 		end
 	end
 end

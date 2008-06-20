@@ -19,7 +19,9 @@ class SpellsController < ApplicationController
 			raise "Attempted to select a spell that isn't yours"
 		end
 		
-		if @spell.is_a?(Spells::CreatureSpell) and params[:illusion].nil?
+		@spell.attributes = params[:spell] || {}
+		
+		if @spell.needs_illusion_flag?
 			if request.xhr?
 				prompt = render_to_string :partial => 'select_real_or_illusion'
 				render :text => "showDialog(#{prompt.to_json})"
@@ -28,6 +30,7 @@ class SpellsController < ApplicationController
 			end
 		else
 			observing_game_events(@game) do
+				@spell.save!
 				@player.choose_spell!(@spell)
 			end
 			
