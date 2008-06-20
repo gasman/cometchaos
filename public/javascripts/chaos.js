@@ -419,6 +419,15 @@ function boltStep(frameNumber, sprites, frameCount, x0, y0, x1, y1) {
 	}
 }
 
+function showDialog(html) {
+	html = jq(html);
+	applyFormRemoting(html);
+	jq('a[href]', html).click(function() {
+		tb_remove();
+	})
+	tb_show(html);
+}
+
 /* end of events */
 
 function setPrompt(text) {

@@ -282,3 +282,30 @@ a:hover { color: #00a; }
 #events_panel #events_list {
 	margin: 4px;
 }
+
+.dialogue_panel {
+	width: 400px;
+	margin: auto;
+	margin-top: 100px;
+	padding: 16px;
+}
+ul.dialogue_actions li {
+	float: left;
+	width: 45%;
+	display: block;
+}
+ul.dialogue_actions li a {
+	display: block;
+	color: #cccccc;
+	margin: 8px auto;
+	width: 80px;
+	text-decoration: none;
+	background-color: #000044;
+	outline: 1px solid #000088;
+	line-height: 20pt;
+	color: #cccccc;
+	text-align: center;
+}
+ul.dialogue_actions li a:hover {
+	background-color: #000088;
+}

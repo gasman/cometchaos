@@ -1,0 +1,6 @@
+<p>Cast this creature as real or illusion?</p>
+<ul class="dialogue_actions">
+	<li><%= link_to 'Real', select_spell_path(@spell, :illusion => false), :class => 'remote post' %></li>
+	<li><%= link_to 'Illusion', select_spell_path(@spell, :illusion => true), :class => 'remote post' %></li>
+</ul>
+<br style="clear: both;" />
