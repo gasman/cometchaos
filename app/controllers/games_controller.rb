@@ -119,11 +119,12 @@ class GamesController < ApplicationController
 		end
 	end
 	
-	# GET /games/1/casting_positions
-	def casting_positions
+	# GET /games/1/casting_targets
+	def casting_targets
 		@game = Game.find(params[:id])
 		raise "You aren't a player in this game" unless playing?
-		render :json => me.casting_positions
+		raise Game::InvalidMove.new, "You cannot cast a spell at this time" unless me.casting?
+		render :json => me.next_spell.casting_targets
 	end
 	
 	# POST /games/1/cast_spell
@@ -132,7 +133,12 @@ class GamesController < ApplicationController
 		raise "You aren't a player in this game" unless playing?
 		@spell = me.next_spell
 		observing_game_events(@game) do
-			me.cast!(params[:x], params[:y])
+			if params[:sprite_id]
+				@sprite = @game.sprites.find(params[:sprite_id])
+				me.cast_at_sprite!(@sprite)
+			else
+				me.cast_at_space!(params[:x], params[:y])
+			end
 		end
 		
 		if request.xhr?

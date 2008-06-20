@@ -10,7 +10,7 @@
 
 	<% if playing? and me.casting? %>
 		jq(function() {
-			showCastingPositions(<%= me.casting_positions.to_json %>);
+			showCastingTargets(<%= me.next_spell.casting_targets.to_json %>);
 		});
 	<% end %>
 <% end %>

@@ -109,27 +109,22 @@ class Player < ActiveRecord::Base
 		end
 	end
 	
-	# coordinates where this player can cast his next spell
-	def casting_positions
-		raise Game::InvalidMove.new, "You cannot cast a spell at this time" unless casting?
-		
-		occupied_squares = game.sprites.collect{|sprite| [sprite.x, sprite.y]}
-		available_squares = []
-		
-		wizard_sprite.each_adjacent_square do |x,y|
-			available_squares << [x,y] unless occupied_squares.include?([x,y])
-		end
-		available_squares
-	end
-	
-	def cast!(x, y)
+	def cast_at_space!(x, y)
 		x = x.to_i
 		y = y.to_i
 		raise Game::InvalidMove.new, "You cannot cast a spell at this time" unless casting?
-		raise Game::InvalidMove.new, "Out of range" unless casting_positions.include?([x,y])
-		next_spell.cast!(x,y)
+		raise Game::InvalidMove.new, "Out of range" unless (next_spell.casting_targets[:spaces] || []).include?([x,y])
+		next_spell.cast_at_space!(x,y)
 		# TODO: don't discard spell / end turn if there are still shots remaining
-		next_spell.destroy
+		self.next_spell = nil
+		save!
+		end_turn
+	end
+	def cast_at_sprite!(sprite)
+		raise Game::InvalidMove.new, "You cannot cast a spell at this time" unless casting?
+		raise Game::InvalidMove.new, "Out of range" unless (next_spell.casting_targets[:sprites] || []).include?(sprite.id)
+		next_spell.cast_at_sprite!(sprite)
+		# TODO: don't discard spell / end turn if there are still shots remaining
 		self.next_spell = nil
 		save!
 		end_turn

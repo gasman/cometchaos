@@ -1,7 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
 	map.resources :players, :member => { :op => :post, :deop => :post }
 	map.resources :games, :has_many => [:players], :member => {
-		:start => :post, :casting_positions => :get, :cast_spell => :post,
+		:start => :post, :casting_targets => :get, :cast_spell => :post,
 		:end_turn => :post } do |games|
 		games.resources :spells
 	end

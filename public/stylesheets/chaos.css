@@ -82,6 +82,12 @@ a:hover { color: #00a; }
 	#board .casting_position:hover {
 		background-color: #666666;
 	}
+	#board .sprite.attackable {
+		background-color: #333333;
+	}	
+	#board .sprite.attackable:hover {
+		background-color: #666666;
+	}	
 	#board .move_position {
 		position: absolute;
 		width: 32px;

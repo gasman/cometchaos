@@ -253,7 +253,7 @@ function beginCasting(playerId, playerName) {
 		if (myPlayerId == playerId) {
 			personalState = 'casting';
 			setPrompt('Your turn');
-			jq.get('/games/' + gameId + '/casting_positions', null, showCastingPositions, 'json');
+			jq.get('/games/' + gameId + '/casting_targets', null, showCastingTargets, 'json');
 			showConditionalFurniture();
 		} else {
 			setPrompt(playerName + "\'s turn");
@@ -261,9 +261,14 @@ function beginCasting(playerId, playerName) {
 		return true;
 	});
 }
-function showCastingPositions(positions) {
-	for (var i = 0; i < positions.length; i++) {
-		insertCastingPosition(positions[i][0], positions[i][1]);
+function showCastingTargets(targets) {
+	var spaces = targets.spaces || [];
+	for (var i = 0; i < spaces.length; i++) {
+		insertCastingPosition(spaces[i][0], spaces[i][1]);
+	}
+	var sprites = targets.sprites || []
+	for (var i = 0; i < sprites.length; i++) {
+		jq('#sprite_'+sprites[i]).addClass('attackable');
 	}
 }
 function insertCastingPosition(x,y) {
@@ -271,9 +276,13 @@ function insertCastingPosition(x,y) {
 	square.css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
 	square.click(function() {
 		jq.post('/games/' + gameId + '/cast_spell', {'x': x, 'y': y}, function() {}, 'script');
-		jq('#board .casting_position').remove();
+		hideCastingTargets();
 	});
 	jq('#board').append(square);
+}
+function hideCastingTargets() {
+	jq('#board .casting_position').remove();
+	jq('#board .sprite').removeClass('attackable');
 }
 
 function discardSpell(id) {
@@ -336,21 +345,25 @@ function putSprite(id, img, x, y, playerId) {
 				}, function() {
 					jq(this).removeClass('highlight');
 				});
-				sprite.click(function() {
-					if (personalState == 'fighting') {
-						if (selectedSpriteForMovement == null) {
-							/* clicked on sprite to start movement */
-							selectedSpriteForMovement = id;
-							jq.get('/sprites/' + id + '/move_positions', null,
-								function(positions) {showMovePositions(id, positions)}, 'json');
-						} else if (selectedSpriteForMovement == id) {
-							/* clicked on sprite again to cancel movement */
-							selectedSpriteForMovement = null;
-							jq('#board .move_position').remove();
-						}
-					}
-				});
 			}
+
+			sprite.click(function() {
+				if (personalState == 'casting' && jq(this).hasClass('attackable')) {
+					jq.post('/games/' + gameId + '/cast_spell', {'sprite_id': id}, function() {}, 'script');
+					hideCastingTargets();
+				} else if (personalState == 'fighting' && myPlayerId == playerId) {
+					if (selectedSpriteForMovement == null) {
+						/* clicked on sprite to start movement */
+						selectedSpriteForMovement = id;
+						jq.get('/sprites/' + id + '/move_positions', null,
+							function(positions) {showMovePositions(id, positions)}, 'json');
+					} else if (selectedSpriteForMovement == id) {
+						/* clicked on sprite again to cancel movement */
+						selectedSpriteForMovement = null;
+						jq('#board .move_position').remove();
+					}
+				}
+			});
 		}
 		sprite.attr('src', img).css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
 		jq('#board').append(sprite);
