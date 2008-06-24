@@ -7,7 +7,7 @@ ActionController::Routing::Routes.draw do |map|
 	end
 	
 	map.resources :spells, :member => { :select => :post }
-	map.resources :sprites, :member => { :move_positions => :get, :move => :post }
+	map.resources :sprites, :member => { :move_targets => :get, :move => :post, :attack => :post }
 
 	map.root :controller => 'games'
 

@@ -205,7 +205,7 @@ a:hover { color: #00a; }
 }
 
 #players_panel #players_list li.me {
-	background-color: salmon;
+	background-color: mistyrose;
 }
 #players_panel #players_list li.me .name {
 	font-weight: bold;

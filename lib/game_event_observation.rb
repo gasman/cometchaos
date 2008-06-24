@@ -27,6 +27,8 @@ module GameEventObservation
 				game_responses << "followUpEvent('Spell fails');"
 			end
 		end
+		
+		# TODO: handle on_receive_attack (show explosion)
 
 		for_players_triggering(:after_create) do |player|
 			player_html = render_to_string :partial => 'games/player', :object => player

@@ -351,16 +351,19 @@ function putSprite(id, img, x, y, playerId) {
 				if (personalState == 'casting' && jq(this).hasClass('attackable')) {
 					jq.post('/games/' + gameId + '/cast_spell', {'sprite_id': id}, function() {}, 'script');
 					hideCastingTargets();
+				} else if (personalState == 'fighting' && jq(this).hasClass('attackable')) {
+					jq.post('/sprites/' + selectedSpriteForMovement + '/attack', {'sprite_id': id}, function(targets) {showMoveTargets(id, targets)}, 'json');
+					hideMoveTargets();
 				} else if (personalState == 'fighting' && myPlayerId == playerId) {
 					if (selectedSpriteForMovement == null) {
 						/* clicked on sprite to start movement */
 						selectedSpriteForMovement = id;
-						jq.get('/sprites/' + id + '/move_positions', null,
-							function(positions) {showMovePositions(id, positions)}, 'json');
+						jq.get('/sprites/' + id + '/move_targets', null,
+							function(targets) {showMoveTargets(id, targets)}, 'json');
 					} else if (selectedSpriteForMovement == id) {
 						/* clicked on sprite again to cancel movement */
 						selectedSpriteForMovement = null;
-						jq('#board .move_position').remove();
+						hideMoveTargets();
 					}
 				}
 			});
@@ -370,6 +373,13 @@ function putSprite(id, img, x, y, playerId) {
 		return true;
 	});
 }
+
+function hideMoveTargets() {
+	jq('#board .move_position').remove();
+	jq('#board .sprite').removeClass('attackable');
+	setPrompt('Your turn');
+}
+
 function removeSprite(id) {
 	chain(function() {
 		jq('#sprite_'+id).remove();
@@ -459,13 +469,20 @@ function applySpellAnchors() {
 	});
 }
 
-function showMovePositions(spriteId, positions) {
-	if (positions.length == 0) {
+function showMoveTargets(spriteId, targets) {
+	var spaces = targets.spaces || [];
+	for (var i = 0; i < spaces.length; i++) {
+		insertMovePosition(spriteId, spaces[i][0], spaces[i][1]);
+	}
+	var sprites = targets.sprites || [];
+	for (var i = 0; i < sprites.length; i++) {
+		jq('#sprite_'+sprites[i]).addClass('attackable');
+	}
+	if (targets.engaged_to_enemy) {
+		setPrompt('Engaged to enemy');
+	}
+	if (spaces.length == 0 && sprites.length == 0) {
 		selectedSpriteForMovement = null;
-	} else {
-		for (var i = 0; i < positions.length; i++) {
-			insertMovePosition(spriteId, positions[i][0], positions[i][1]);
-		}
 	}
 }
 function insertMovePosition(spriteId, x,y) {
@@ -473,7 +490,7 @@ function insertMovePosition(spriteId, x,y) {
 	square.css({'left': (16+x*32)+'px', 'top': (16+y*32)+'px'});
 	square.click(function() {
 		jq.post('/sprites/' + spriteId + '/move', {'x': x, 'y': y}, 
-			function(positions) {showMovePositions(spriteId, positions)}, 'json');
+			function(targets) {showMoveTargets(spriteId, targets)}, 'json');
 		jq('#board .move_position').remove();
 	});
 	jq('#board').append(square);
