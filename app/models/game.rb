@@ -89,7 +89,7 @@ class Game < ActiveRecord::Base
 		else
 			# the departure of a player might make it possible to move to the next game
 			# state - for example, if they were the last player left to choose a spell
-			game.continue!
+			continue!
 		end
 	end
 	
