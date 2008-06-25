@@ -135,8 +135,10 @@ class GamesController < ApplicationController
 		observing_game_events(@game) do
 			if params[:sprite_id]
 				@sprite = @game.sprites.find(params[:sprite_id])
+				# TODO: validate against casting targets
 				me.cast_at_sprite!(@sprite)
 			else
+				# TODO: validate against casting targets
 				me.cast_at_space!(params[:x], params[:y])
 			end
 		end

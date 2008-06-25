@@ -1,6 +1,22 @@
 class Sprite < ActiveRecord::Base
 	belongs_to :player
 	
+	DISTANCES = [
+		[9,9,9,9,9,9,6,9,9,9,9,9,9],
+		[9,9,9,9,6,5,5,5,6,9,9,9,9],
+		[9,9,6,5,5,4,4,4,5,5,6,9,9],
+		[9,9,5,4,4,3,3,3,4,4,5,9,9],
+		[9,6,5,4,3,2,2,2,3,4,5,6,9],
+		[9,5,4,3,2,1,1,1,2,3,4,5,9],
+		[6,5,4,3,2,1,0,1,2,3,4,5,6],
+		[9,5,4,3,2,1,1,1,2,3,4,5,9],
+		[9,6,5,4,3,2,2,2,3,4,5,6,9],
+		[9,9,5,4,4,3,3,3,4,4,5,9,9],
+		[9,9,6,5,5,4,4,4,5,5,6,9,9],
+		[9,9,9,9,6,5,5,5,6,9,9,9,9],
+		[9,9,9,9,9,9,6,9,9,9,9,9,9],
+	]
+	
 	def game
 		@game ||= player.game
 	end
@@ -14,13 +30,20 @@ class Sprite < ActiveRecord::Base
 		game
 	end
 	
-	def each_adjacent_square
-		(self.x - 1).upto(self.x + 1) do |x|
-			(self.y - 1).upto(self.y + 1) do |y|
+	def each_square_within(distance)
+		(-6..6).each do |dy|
+			(-6..6).each do |dx|
+				x = self.x + dx
+				y = self.y + dy
 				next unless (0...Game::BOARD_WIDTH) === x and (0...Game::BOARD_HEIGHT) === y
+				next if DISTANCES[dy+6][dx+6] > distance
 				yield x,y
 			end
-		end
+		end	
+	end
+	
+	def each_adjacent_square(&block)
+		each_square_within(1, &block)
 	end
 	
 	def neighbouring_enemies

@@ -121,6 +121,14 @@ class Game < ActiveRecord::Base
 		end
 	end
 	
+	def sprites_by_location
+		result = {}
+		sprites.each do |sprite|
+			result[[sprite.x, sprite.y]] = sprite
+		end
+		result
+	end
+	
 	private
 	
 	def set_wizard_start_positions(players)
