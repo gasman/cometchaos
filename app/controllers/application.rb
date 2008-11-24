@@ -16,6 +16,8 @@ class ApplicationController < ActionController::Base
 	# authenticity token around in a JS variable and attaching this at the point
 	# of receiving Comet messages.
 
+	include AuthenticatedSystem
+
 	private
 	helper_method :playing?, :me, :become_player
 

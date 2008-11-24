@@ -3,6 +3,13 @@
 body {
 	background-color: #222;
 }
+.login_bar {
+	background-color: white;
+	line-height: 2em;
+	font-size: 8pt;
+	padding-left: 8px;
+	margin-bottom: 4px;
+}
 .panel {
 	background-color: white;
 }
