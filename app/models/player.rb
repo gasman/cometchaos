@@ -1,5 +1,6 @@
 class Player < ActiveRecord::Base
 	belongs_to :game
+	belongs_to :user
 	has_many :spells, :class_name => 'Spells::Spell', :include => :spell_variety
 	acts_as_list :scope => :game
 	

@@ -36,12 +36,13 @@ a:hover { color: #00a; }
 	margin-bottom: 0.4em;
 }
 
-#games_list {
+.games_list {
 	list-style: none;
 	margin: 0;
 	padding: 0;
+	margin-bottom: 8px;
 }
-#games_list li {
+.games_list li {
 	border: 1px solid silver;
 	margin: 1px;
 	padding-left: 4px;
@@ -49,11 +50,11 @@ a:hover { color: #00a; }
 	list-style: none;
 	background-color: #ffffdd;
 }
-#games_list li .heading {
+.games_list li .heading {
 	line-height: 16pt;
 	font-size: 12pt;
 }
-#games_list li .info {
+.games_list li .info {
 	font-size: 8pt;
 }
 

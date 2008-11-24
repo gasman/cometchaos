@@ -15,6 +15,18 @@ module AuthenticatedSystem
 		# Store the given user id in the session.
 		def current_user=(new_user)
 			session[:user_id] = new_user ? new_user.id : nil
+			if new_user
+				# assign all players currently being played to this user
+				if session[:games]
+					session[:games].each_pair do |key, value|
+						Player.find(value[:player_id]).update_attribute(:user_id, new_user.id)
+					end
+				end
+				# attach all the user's players to the session
+				new_user.players.each do |player|
+					become_player(player)
+				end
+			end
 			@current_user = new_user || false
 		end
 

@@ -1,8 +1,15 @@
 <div id="splash" class="panel">
 	<h1>Chaos: The Battle Of Wizards</h2>
 	
+	<% if logged_in? and current_user.games.any? %>
+		<h2>Your games</h2>
+		<ul id="games_list" class="games_list">
+			<%= render :partial => 'announcement', :collection => current_user.games, :locals => {:attach_id => false} %>
+		</ul>
+	<% end %>
+	
 	<h2>Active games</h2>
-	<ul id="games_list">
+	<ul id="games_list" class="games_list">
 		<%= render :partial => 'announcement', :collection => @games %>
 	</ul>
 	

@@ -11,6 +11,7 @@ class SessionsController < ApplicationController
 				current_user.remember_me unless current_user.remember_token?
 				cookies[:auth_token] = { :value => self.current_user.remember_token , :expires => self.current_user.remember_token_expires_at }
 			end
+
 			redirect_back_or_default('/')
 		else
 			render :action => 'new'
@@ -18,6 +19,9 @@ class SessionsController < ApplicationController
 	end
 
 	def destroy
+		# forget all games currently being played
+		session[:games] = {}
+		
 		self.current_user.forget_me if logged_in?
 		cookies.delete :auth_token
 		reset_session

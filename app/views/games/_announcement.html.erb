@@ -1,5 +1,6 @@
 <% game = announcement %>
-<li id="game_<%= game.id %>">
+<% attach_id = true if attach_id.nil? %>
+<li <% if attach_id %>id="game_<%= game.id %>"<% end %>>
 	<div class="heading"><%= link_to "Game #{game.id}", game %> - <%= pluralize(game.players.count, 'player', 'players') %></div>
 	<div class="info">
 		started <%= time_ago_in_words(game.created_at) %> ago.
