@@ -1,7 +1,5 @@
 class UsersController < ApplicationController
-	# Be sure to include AuthenticationSystem in Application Controller instead
-	include AuthenticatedSystem
-	
+	before_filter :login_required, :only => :edit
 
 	# render new.rhtml
 	def new
@@ -20,6 +18,19 @@ class UsersController < ApplicationController
 			redirect_back_or_default('/')
 		else
 			render :action => 'new'
+		end
+	end
+	
+	def edit
+		if request.post?
+			current_user.attributes = params[:user]
+			if current_user.save
+				redirect_back_or_default('/')
+			else
+				@user = current_user
+			end
+		else
+			@user = current_user
 		end
 	end
 

@@ -1,0 +1,15 @@
+<div class="dialogue_panel panel">
+	<%= error_messages_for :user %>
+	<% form_for :user, :url => edit_user_path do |f| -%>
+	<p><label for="login">Login</label><br/>
+	<%= f.text_field :login %></p>
+	
+	<p><label for="password">Password (leave blank if not changing)</label><br/>
+	<%= f.password_field :password %></p>
+	
+	<p><label for="password_confirmation">Confirm Password</label><br/>
+	<%= f.password_field :password_confirmation %></p>
+	
+	<p><%= submit_tag 'Update' %></p>
+	<% end -%>
+</div>
