@@ -7,6 +7,7 @@ class GamesController < ApplicationController
 		@games = Game.all_active_public
 		@game = Game.new
 		@player = Player.new
+		@player.name = current_user.login if logged_in?
 
 		respond_to do |format|
 			format.html # index.html.erb
@@ -19,6 +20,7 @@ class GamesController < ApplicationController
 	def show
 		@game = Game.find(params[:id])
 		@new_player = Player.new
+		@new_player.name = current_user.login if logged_in?
 
 		respond_to do |format|
 			format.html # show.html.erb
@@ -31,6 +33,7 @@ class GamesController < ApplicationController
 	def new
 		@game = Game.new
 		@player = Player.new
+		@player.name = current_user.login if logged_in?
 
 		respond_to do |format|
 			format.html # new.html.erb
@@ -50,6 +53,7 @@ class GamesController < ApplicationController
 		@player = Player.new(params[:player])
 		@player.is_operator = true
 		@player.game = @game # required to make @player valid
+		@player.user = current_user if logged_in?
 
 		if @player.valid? and @game.valid?
 			observing_game_events(@game) do
